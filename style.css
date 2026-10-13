@@ -390,3 +390,42 @@ main {
     background-color: var(--seal-red);
     color: var(--parchment);
 }
+
+
+.layout {
+    width: 100%;
+    max-width: 1300px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.layout .input-stack {
+    flex: 1 1 400px;
+    max-width: 600px;
+}
+
+.small-row {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.small-row .text-box-small {
+    flex: 1;
+    min-width: 0;
+}
+
+.response-box {
+    flex: 1 1 280px;
+    max-width: 400px;
+    display: flex;
+}
+
+.response-box textarea {
+    flex: 1;
+    height: auto;
+    min-height: 220px;
+    resize: none;
+}
