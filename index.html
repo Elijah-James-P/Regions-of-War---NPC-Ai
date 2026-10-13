@@ -18,19 +18,37 @@
     </header>
 
     <main>
-        <div class="input-stack">
-            <div class="text-box text-box-small gold-corners">
-                <input type="text" id="recipient-input" placeholder="Recipient Nation" aria-label="Recipient Nation" autocomplete="off">
-                <ul class="nation-dropdown" id="nation-dropdown">
+        <div class="layout">
+            <div class="input-stack">
+                <div class="small-row">
+                <div class="text-box text-box-small gold-corners nation-picker">
+                    <input type="text" id="sender-input" placeholder="Sender Nation" aria-label="Sender Nation" autocomplete="off">
+                    <ul class="nation-dropdown">
+                    <li>Real Nation 1</li>
+                    <li>Real Nation 2</li>
+                    <li>Real Nation 3</li>
+                    <li>Real Nation 4</li>
+                    <li>Real Nation 5</li>
+                    </ul>
+                </div>
+                <div class="text-box text-box-small gold-corners nation-picker">
+                    <input type="text" id="recipient-input" placeholder="Recipient Nation" aria-label="Recipient Nation" autocomplete="off">
+                    <ul class="nation-dropdown">
                     <li>NPC Nation 1</li>
                     <li>NPC Nation 2</li>
                     <li>NPC Nation 3</li>
                     <li>NPC Nation 4</li>
                     <li>NPC Nation 5</li>
-                </ul>
+                    </ul>
+                </div>
+                </div>
+                <div class="text-box gold-corners">
+                    <textarea id="visitor-text" placeholder="Input desired action here" aria-label="Enter your desired action"></textarea>
+                </div>
+                <button type="button" class="open-button" id="send-button">Send</button>
             </div>
-            <div class="text-box gold-corners">
-                <textarea id="visitor-text" placeholder="Input desired action here" aria-label="Enter your desired action"></textarea>
+            <div class="response-box text-box gold-corners">
+                <textarea id="ai-response" placeholder="The response will appear here..." aria-label="Response" readonly></textarea>
             </div>
         </div>
     </main>
@@ -174,6 +192,7 @@
         </div>
     </div>
 
+    <script src="actions.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
