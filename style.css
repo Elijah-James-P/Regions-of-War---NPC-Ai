@@ -429,3 +429,15 @@ main {
     min-height: 220px;
     resize: none;
 }
+
+
+.open-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.open-button:disabled:hover {
+    background-color: transparent;
+    color: var(--ink);
+    border-color: var(--brass);
+}
