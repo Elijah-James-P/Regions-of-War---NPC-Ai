@@ -150,13 +150,47 @@ function pickReply(replies, key) {
     return replies[index];
 }
 
+// Returns the special replies for a nation (see nationReplies in actions.js), or null
+function findPersonality(nationName) {
+    if (typeof nationReplies === "undefined") {
+        return null;
+    }
+    const wanted = nationName.trim().toLowerCase();
+    const match = Object.keys(nationReplies).find(function (name) {
+        return name.toLowerCase() === wanted;
+    });
+    return match ? nationReplies[match] : null;
+}
+
 function fillNames(reply, sender, recipient) {
     return reply.split("{sender}").join(sender).split("{recipient}").join(recipient);
 }
 
+/* ---------- History and reply delay ---------- */
+
+const MAX_HISTORY = 5;          // how many past exchanges to keep on screen
+const MIN_DELAY = 700;          // shortest reply pause in milliseconds
+const MAX_DELAY = 1400;         // longest reply pause in milliseconds
+const history = [];
+
+// Shows the saved history, plus an optional temporary line at the end
+// (used for the pending message and error messages, which are not saved)
+function renderResponse(temporaryText) {
+    let text = history
+        .map(function (entry) { return entry.sent + "\n" + entry.reply; })
+        .join("\n\n");
+
+    if (temporaryText) {
+        text += (text ? "\n\n" : "") + temporaryText;
+    }
+
+    responseBox.value = text;
+    responseBox.scrollTop = responseBox.scrollHeight;
+}
+
 function handleSend() {
     if (typeof actions === "undefined" || typeof fallbackReplies === "undefined") {
-        responseBox.value = "Error: actions.js was not loaded. Make sure actions.js is in the same folder as index.html.";
+        renderResponse("Error: actions.js was not loaded. Make sure actions.js is in the same folder as index.html.");
         return;
     }
 
@@ -165,24 +199,49 @@ function handleSend() {
     const actionText = actionInput.value.trim();
 
     if (!sender) {
-        responseBox.value = "Choose a sender nation first.";
+        renderResponse("Choose a sender nation first.");
         return;
     }
     if (!recipient) {
-        responseBox.value = "Choose a recipient nation first.";
+        renderResponse("Choose a recipient nation first.");
         return;
     }
     if (!actionText) {
-        responseBox.value = "Enter an action to send.";
+        renderResponse("Enter an action to send.");
         return;
     }
 
     const action = findAction(actionText);
-    const reply = action
-        ? pickReply(action.replies, action.name)
-        : pickReply(fallbackReplies, "fallback");
+    const personality = findPersonality(recipient);
+    let replies;
+    let replyKey;
 
-    responseBox.value = fillNames(reply, sender, recipient);
+    if (action) {
+        replies = (personality && personality.actions[action.name]) || action.replies;
+        replyKey = recipient + "|" + action.name;
+    } else {
+        replies = (personality && personality.fallback) || fallbackReplies;
+        replyKey = recipient + "|fallback";
+    }
+
+    const reply = pickReply(replies, replyKey);
+
+    const sentLine = sender + " to " + recipient + ": " + actionText;
+    const replyLine = recipient + ": " + fillNames(reply, sender, recipient);
+
+    // Show the sent message, then reveal the reply after a short pause
+    sendButton.disabled = true;
+    renderResponse(sentLine);
+
+    const delay = MIN_DELAY + Math.random() * (MAX_DELAY - MIN_DELAY);
+    setTimeout(function () {
+        history.push({ sent: sentLine, reply: replyLine });
+        while (history.length > MAX_HISTORY) {
+            history.shift();
+        }
+        renderResponse();
+        sendButton.disabled = false;
+    }, delay);
 }
 
 sendButton.addEventListener("click", handleSend);
