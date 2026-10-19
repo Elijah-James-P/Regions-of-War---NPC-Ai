@@ -204,6 +204,8 @@ const fallbackReplies = [
     actions   - replies for each action, matched by the action's name
     fallback  - replies for when no keyword matches
   Any action a nation has no entry for uses the generic replies.
+    allied    - (optional) replies used once the sender has become that nation's ally
+    allianceAnnouncement - (optional) message shown when an alliance is formed
   The nation name must match the dropdown exactly.
 */
 
@@ -286,6 +288,89 @@ const nationReplies = {
         fallback: [
             "The Empire's clerks have read your message several times, {sender}, and still cannot find the transaction in it. {recipient} values clarity above all else in its dealings. Please state plainly what you are offering or requesting.",
             "Your message arrived, but its purpose was unclear, and the Empire does not act on unclear terms. Our ministers suggest you resubmit your request, preferably with specific details, such as a trade offer, a treaty, or a loan."
+        ],
+        allianceAnnouncement: [
+            "By decree of the council, {sender} is now a permanent ally of {recipient}. Our foundries will manufacture arms for your nation from this day forward, and the Empire's merchants will see that you are well supplied. Draven Morde sends his regards and requests a rematch at your convenience."
+],
+        allied: {
+            actions: {
+                "War": [
+                                "Surely you jest, {sender}. Our alliance and the arms contracts that come with it are far too valuable to throw away on a declaration. {recipient} will assume this was a slip of the pen and keep your foundry orders in place.",
+                                "A declaration of war from a partner is unprofitable for everyone, so the Empire is choosing not to hear it. Our treasurers have marked the message as an error. Your arms shipments continue as scheduled."
+                ],
+                "Threaten": [
+                                "Between allies, threats are only expensive misunderstandings, {sender}. The Empire will treat your words as negotiating theatre and keep your arms orders on schedule. We suggest you state your actual terms.",
+                                "{recipient} is not alarmed, {sender}. Our foundries are producing your nation's orders as we speak, and we would hate to see a good contract disrupted by raised voices. Let us speak as partners."
+                ],
+                "Insult": [
+                                "We will overlook that remark, {sender}, the way one overlooks a small rounding error between old business partners. The alliance is a profitable one, and the Empire intends to keep it that way. Our arms deliveries remain unaffected.",
+                                "{recipient} has noted your words and has decided to value the alliance more than the insult. Our foundries do not sulk, and neither do our ledgers. Do try to be more polite on the next shipment."
+                ],
+                "Embargo": [
+                                "An embargo against your own arms supplier would be a curious strategy, {sender}. {recipient} suggests you reconsider before the ledgers begin to protest. Our alliance has more to offer than any restriction could.",
+                                "Our trade ministers are confused by this proposal, since it cuts against the very contracts that bind our nations. We will assume you have a clearer plan in mind. Until we hear it, your shipments continue."
+                ],
+                "Spy": [
+                                "Between allies, there is no need for spies, {sender}. Ask, and the Empire will tell you what it can, for a fair price. {recipient} would rather share intelligence at a table than discover it in a drawer.",
+                                "We prefer not to discuss such matters in writing, even with partners. If your nation needs information, our ministers are happy to arrange it through proper channels. The alliance makes that much easier."
+                ],
+                "Demand tribute": [
+                                "Tribute from your own arms supplier, {sender}? The Empire admires the confidence, but our contracts already define who owes what. Let us review the terms like partners instead.",
+                                "{recipient} does not pay tribute even to its allies, though it will happily discuss better pricing on arms. Our treasurers have prepared a favorable rate for your nation. Shall we negotiate it?"
+                ],
+                "Alliance": [
+                                "Our alliance is already the most profitable arrangement in the ledger, {sender}. {recipient} stands by it fully, and our foundries continue to manufacture arms for your nation. If you wish to deepen it, our ministers will draft the terms.",
+                                "The Empire has not forgotten its commitment, {sender}. Our alliance is permanent, and so are the arms contracts attached to it. Tell us what more your nation requires."
+                ],
+                "Peace": [
+                                "Peace is naturally our preference, and it suits our allies as well, {sender}. {recipient} will gladly help mediate, and our foundries will adjust production to match whatever your nation needs. The ledgers favor calm.",
+                                "The Empire supports any path to peace that keeps our alliance and our trade intact. Our diplomats are ready to assist your nation. Arms production will continue regardless, as insurance."
+                ],
+                "Treaty": [
+                                "Our diplomats and merchant lawyers are delighted to draft a treaty for an ally, {sender}. We will, of course, keep the fine print readable. {recipient} will return the draft with favorable terms for your nation.",
+                                "An agreement between allies is a simple affair, and a profitable one. Our ministers are already reviewing your proposal with our existing arms contracts in mind. A draft will follow shortly."
+                ],
+                "Request aid": [
+                                "Of course, {sender}. That is what allies are for, and what our foundries are for. {recipient} will review what your nation needs and arrange shipments at a rate that reflects our friendship.",
+                                "Your request has been marked as a priority by our treasury, {sender}. The Empire looks after its partners, and our arms foundries can expand production if required. Send us your requirements and we will see to the rest."
+                ],
+                "Apologize": [
+                                "No apology is necessary between allies, {sender}, though the Empire is glad to receive one. The alliance and the arms contracts stand as they always have. Consider the matter closed.",
+                                "{recipient} accepts your words gladly. A friendship that cannot survive a misstep would not be worth the paper it was signed on. Our ledgers show nothing outstanding."
+                ],
+                "Open relations": [
+                                "Greetings, trusted ally. {recipient} is always glad to hear from {sender}, and our foundries are working steadily on your nation's orders. What can the Empire do for you today?",
+                                "It is a pleasure to hear from you, {sender}. Our embassies are open to your nation at all hours, and our merchants have already set aside your preferred terms. Speak freely, as partners do."
+                ],
+                "Trade": [
+                                "Trade with an ally is the best kind, {sender}. {recipient} will offer your nation preferred rates on goods and a priority place in line at our foundries. Our merchants are preparing a proposal now.",
+                                "Naturally, {sender}. As our ally, your nation receives our best prices and first pick of our stock. Our traders will send a detailed offer shortly, with arms and supplies set aside for you."
+                ],
+                "Gift": [
+                                "A gift from an ally is gladly received, {sender}, and it has been entered in the ledger as a mark of goodwill. {recipient} will find a worthy way to return the favor, perhaps in the form of a shipment from our foundries.",
+                                "Your generosity has been noted by our treasury and our council alike. The Empire repays its friends, and often with interest. Expect something fitting from our workshops."
+                ],
+                "Loan": [
+                                "{recipient}'s treasury is pleased to assist an ally, {sender}, and your rate has been set well below our usual. Our ministers will prepare the terms, with some arms credit included. We like our partners solvent.",
+                                "A loan between allies is a matter of trust and good bookkeeping. Our treasurers are preparing a generous offer for your nation. Repayment can be arranged in goods, if that suits you better."
+                ],
+                "Crystals": [
+                                "Crystals are a sensitive subject, even between allies, {sender}. {recipient} is willing to discuss them, and our foundries already know how valuable they are to your nation's arms. Let us talk terms at the table.",
+                                "The Empire watches the crystal market as closely as ever, {sender}, but our alliance gives your nation a place at the front of the line. Our ministers will contact you with what can be shared."
+                ],
+                "Migration or refuge": [
+                                "Our borders are open to the people of your nation, {sender}. {recipient} will arrange shelter and work in our foundries and workshops, which could always use skilled hands. Our ministers are drawing up the arrangements.",
+                                "Those in need from your nation will find a welcome here. The Empire is happy to house them and put them to honest work. Our officials will coordinate the details."
+                ],
+                "Puppet or annex": [
+                                "Annexation is an odd proposal to make to a profitable ally, {sender}. {recipient} would prefer to keep our alliance exactly as it is, with each nation sovereign and the arms flowing freely. Let us discuss something more practical.",
+                                "The Empire values your nation's independence, since an independent ally pays its invoices on time. Our council has set the proposal aside and would like to hear another. Our friendship needs no extra paperwork."
+                ]
+},
+            fallback: [
+                "Our clerks could not quite follow your message, {sender}, though {recipient} is always glad to hear from an ally. State your request plainly, and we will see what can be arranged.",
+                "Your message reached us, trusted ally, but its purpose was unclear. Our ministers are eager to help, if you will rephrase it as a trade, a loan, or a request for arms."
 ]
+        }
     }
 };
