@@ -441,3 +441,100 @@ main {
     color: var(--ink);
     border-color: var(--brass);
 }
+
+
+/* ---------- Chess (Draven Morde easter egg) ---------- */
+
+.chess-opponent {
+    font-family: var(--font-stamp);
+    font-size: 0.8rem;
+    color: var(--seal-red);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: -0.6rem;
+    margin-bottom: 1rem;
+}
+
+.chess-quote {
+    min-height: 4.2em;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-style: italic;
+    color: var(--ink-light);
+}
+
+.chess-board {
+    width: min(100%, 420px);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    border: 2px solid var(--brass);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.chess-square {
+    position: relative;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.chess-square.light { background-color: #eadfc3; }
+.chess-square.dark { background-color: #b08d45; }
+
+.chess-square.lastmove {
+    background-image: linear-gradient(rgba(122, 31, 31, 0.3), rgba(122, 31, 31, 0.3));
+}
+
+.chess-square.in-check {
+    background-image: radial-gradient(circle, rgba(200, 30, 30, 0.75) 0%, rgba(200, 30, 30, 0) 70%);
+}
+
+.chess-square.selected {
+    box-shadow: inset 0 0 0 3px var(--seal-red);
+}
+
+.chess-square.target::after {
+    content: "";
+    position: absolute;
+    width: 28%;
+    height: 28%;
+    border-radius: 50%;
+    background-color: rgba(43, 32, 21, 0.45);
+    pointer-events: none;
+}
+
+.chess-square.target.capture::after {
+    width: 86%;
+    height: 86%;
+    background: none;
+    border: 3px solid rgba(122, 31, 31, 0.75);
+}
+
+.chess-piece {
+    font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "DejaVu Sans", serif;
+    font-size: clamp(1.4rem, 7vw, 2.5rem);
+    line-height: 1;
+}
+
+.chess-piece.white {
+    color: #fff8e4;
+    text-shadow: -1px -1px 0 #2b2015, 1px -1px 0 #2b2015, -1px 1px 0 #2b2015, 1px 1px 0 #2b2015, 0 0 3px #2b2015;
+}
+
+.chess-piece.black {
+    color: #1d140b;
+}
+
+.chess-status {
+    margin-top: 1rem;
+    text-align: center;
+    font-family: var(--font-stamp);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+}
