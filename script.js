@@ -177,7 +177,7 @@ const history = [];
 // (used for the pending message and error messages, which are not saved)
 function renderResponse(temporaryText) {
     let text = history
-        .map(function (entry) { return entry.sent + "\n" + entry.reply; })
+        .map(function (entry) { return entry.sent ? entry.sent + "\n" + entry.reply : entry.reply; })
         .join("\n\n");
 
     if (temporaryText) {
@@ -186,6 +186,74 @@ function renderResponse(temporaryText) {
 
     responseBox.value = text;
     responseBox.scrollTop = responseBox.scrollHeight;
+}
+
+/* ---------- Alliances ---------- */
+
+// Alliances are remembered in the visitor's browser so they stay between visits
+const ALLIANCE_STORAGE_KEY = "regionsOfWarAlliances";
+let alliances = loadAlliances();
+
+function loadAlliances() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(ALLIANCE_STORAGE_KEY));
+        return saved && typeof saved === "object" ? saved : {};
+    } catch (error) {
+        return {};
+    }
+}
+
+function saveAlliances() {
+    try {
+        localStorage.setItem(ALLIANCE_STORAGE_KEY, JSON.stringify(alliances));
+    } catch (error) {
+        // Storage unavailable: the alliance lasts until the page is closed
+    }
+}
+
+function allianceKey(name) {
+    return name.trim().toLowerCase();
+}
+
+function isAllied(recipient, sender) {
+    const list = alliances[allianceKey(recipient)];
+    return Array.isArray(list) && list.indexOf(allianceKey(sender)) !== -1;
+}
+
+// Returns true if the alliance is new, false if it already existed
+function addAlliance(recipient, sender) {
+    if (isAllied(recipient, sender)) {
+        return false;
+    }
+    const key = allianceKey(recipient);
+    if (!Array.isArray(alliances[key])) {
+        alliances[key] = [];
+    }
+    alliances[key].push(allianceKey(sender));
+    saveAlliances();
+    return true;
+}
+
+// Adds the nation's alliance announcement to the response box
+function announceAlliance(recipient, sender) {
+    const personality = findPersonality(recipient);
+    if (!personality || !personality.allianceAnnouncement) {
+        return;
+    }
+    const text = pickReply(personality.allianceAnnouncement, recipient + "|announcement");
+    history.push({ sent: "", reply: recipient + ": " + fillNames(text, sender, recipient) });
+    while (history.length > MAX_HISTORY) {
+        history.shift();
+    }
+    renderResponse();
+}
+
+// True when the visitor challenges the Carmine Empire to chess (see chess-ui.js)
+function isChessEasterEgg(recipient, text) {
+    return typeof isChessRequest === "function" &&
+        typeof startChessGame === "function" &&
+        recipient.trim().toLowerCase() === "carmine empire" &&
+        isChessRequest(text);
 }
 
 function handleSend() {
@@ -211,23 +279,37 @@ function handleSend() {
         return;
     }
 
-    const action = findAction(actionText);
-    const personality = findPersonality(recipient);
-    let replies;
-    let replyKey;
-
-    if (action) {
-        replies = (personality && personality.actions[action.name]) || action.replies;
-        replyKey = recipient + "|" + action.name;
-    } else {
-        replies = (personality && personality.fallback) || fallbackReplies;
-        replyKey = recipient + "|fallback";
-    }
-
-    const reply = pickReply(replies, replyKey);
-
     const sentLine = sender + " to " + recipient + ": " + actionText;
-    const replyLine = recipient + ": " + fillNames(reply, sender, recipient);
+    let replyLine;
+    let afterReply = null;
+
+    if (isChessEasterEgg(recipient, actionText)) {
+        // Easter egg: Draven Morde of the Carmine Empire accepts a game of chess
+        const intro = pickReply(dravenIntroReplies, "draven-intro");
+        replyLine = "Draven Morde: " + fillNames(intro, sender, recipient);
+        afterReply = startChessGame;
+    } else {
+        const action = findAction(actionText);
+        const personality = findPersonality(recipient);
+        const allied = personality && personality.allied && isAllied(recipient, sender) ? personality.allied : null;
+        let replies;
+        let replyKey;
+
+        if (action) {
+            replies = (allied && allied.actions[action.name]) ||
+                (personality && personality.actions[action.name]) ||
+                action.replies;
+            replyKey = recipient + "|" + (allied ? "allied|" : "") + action.name;
+        } else {
+            replies = (allied && allied.fallback) ||
+                (personality && personality.fallback) ||
+                fallbackReplies;
+            replyKey = recipient + "|" + (allied ? "allied|" : "") + "fallback";
+        }
+
+        const reply = pickReply(replies, replyKey);
+        replyLine = recipient + ": " + fillNames(reply, sender, recipient);
+    }
 
     // Show the sent message, then reveal the reply after a short pause
     sendButton.disabled = true;
@@ -241,6 +323,9 @@ function handleSend() {
         }
         renderResponse();
         sendButton.disabled = false;
+        if (afterReply) {
+            afterReply(sender);
+        }
     }, delay);
 }
 
