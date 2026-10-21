@@ -188,6 +188,37 @@ function renderResponse(temporaryText) {
     responseBox.scrollTop = responseBox.scrollHeight;
 }
 
+/* ---------- Typewriter reveal ---------- */
+
+const TYPE_REPLIES = true;       // set to false to show replies all at once
+const TYPE_STEP_MS = 16;         // pause between steps, in milliseconds
+const TYPE_CHARS_PER_STEP = 3;   // letters added at each step
+
+function prefersReducedMotion() {
+    return typeof window !== "undefined" && typeof window.matchMedia === "function" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+// Types the reply out letter by letter in the response box, then calls done()
+function typeReply(sentLine, replyLine, done) {
+    if (!TYPE_REPLIES || prefersReducedMotion()) {
+        done();
+        return;
+    }
+
+    let shown = 0;
+    function step() {
+        shown += TYPE_CHARS_PER_STEP;
+        if (shown >= replyLine.length) {
+            done();
+            return;
+        }
+        renderResponse(sentLine + "\n" + replyLine.slice(0, shown));
+        setTimeout(step, TYPE_STEP_MS);
+    }
+    step();
+}
+
 /* ---------- Alliances ---------- */
 
 // Alliances are remembered in the visitor's browser so they stay between visits
@@ -216,6 +247,14 @@ function allianceKey(name) {
 }
 
 function isAllied(recipient, sender) {
+    // A status set in the authority panel (admin.js) wins over an alliance won at chess
+    if (typeof getExplicitRelation === "function") {
+        const explicit = getExplicitRelation(recipient, sender);
+        if (explicit) {
+            return explicit === "Allied";
+        }
+    }
+
     const list = alliances[allianceKey(recipient)];
     return Array.isArray(list) && list.indexOf(allianceKey(sender)) !== -1;
 }
@@ -317,15 +356,17 @@ function handleSend() {
 
     const delay = MIN_DELAY + Math.random() * (MAX_DELAY - MIN_DELAY);
     setTimeout(function () {
-        history.push({ sent: sentLine, reply: replyLine });
-        while (history.length > MAX_HISTORY) {
-            history.shift();
-        }
-        renderResponse();
-        sendButton.disabled = false;
-        if (afterReply) {
-            afterReply(sender);
-        }
+        typeReply(sentLine, replyLine, function () {
+            history.push({ sent: sentLine, reply: replyLine });
+            while (history.length > MAX_HISTORY) {
+                history.shift();
+            }
+            renderResponse();
+            sendButton.disabled = false;
+            if (afterReply) {
+                afterReply(sender);
+            }
+        });
     }, delay);
 }
 
