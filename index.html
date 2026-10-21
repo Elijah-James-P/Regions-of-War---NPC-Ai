@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Archive | A Nation-Building Chronicle</title>
 
+    <meta name="theme-color" content="#1a1510">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2064%2064%27%3E%3Ccircle%20cx=%2732%27%20cy=%2732%27%20r=%2729%27%20fill=%27%237a1f1f%27/%3E%3Ccircle%20cx=%2732%27%20cy=%2732%27%20r=%2723%27%20fill=%27none%27%20stroke=%27%23b8923a%27%20stroke-width=%272%27/%3E%3Ctext%20x=%2732%27%20y=%2743%27%20font-size=%2730%27%20text-anchor=%27middle%27%20fill=%27%23f2e9d0%27%20font-family=%27serif%27%20font-weight=%27bold%27%3ER%3C/text%3E%3C/svg%3E">
+    <link rel="preload" as="image" href="WebsiteBG.jpeg">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Special+Elite&display=swap" rel="stylesheet">
@@ -14,41 +18,53 @@
 <body>
 
     <header>
-        <h1>Regions of War</h1>
+        <div class="header-inner">
+            <span class="header-rule" aria-hidden="true"></span>
+            <h1>Regions of War</h1>
+            <span class="header-rule header-rule-right" aria-hidden="true"></span>
+        </div>
     </header>
 
     <main>
+        <button type="button" class="admin-gear" id="admin-gear" aria-label="Authority access" title="Authority access">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M19.99 10.16 L22.88 10.37 L22.88 13.63 L19.99 13.84 L19.58 15.14 L18.95 16.35 L20.84 18.54 L18.54 20.84 L16.35 18.95 L15.14 19.58 L13.84 19.99 L13.63 22.88 L10.37 22.88 L10.16 19.99 L8.86 19.58 L7.65 18.95 L5.46 20.84 L3.16 18.54 L5.05 16.35 L4.42 15.14 L4.01 13.84 L1.12 13.63 L1.12 10.37 L4.01 10.16 L4.42 8.86 L5.05 7.65 L3.16 5.46 L5.46 3.16 L7.65 5.05 L8.86 4.42 L10.16 4.01 L10.37 1.12 L13.63 1.12 L13.84 4.01 L15.14 4.42 L16.35 5.05 L18.54 3.16 L20.84 5.46 L18.95 7.65 L19.58 8.86 Z M15.60 12.00 A3.60 3.60 0 1 0 8.40 12.00 A3.60 3.60 0 1 0 15.60 12.00 Z"/></svg>
+        </button>
         <div class="layout">
-            <div class="input-stack">
+            <div class="sheet dispatch gold-corners">
+                <h2 class="panel-label">Outgoing Dispatch</h2>
                 <div class="small-row">
-                <div class="text-box text-box-small gold-corners nation-picker">
+                <div class="field nation-picker">
+                    <label class="field-label" for="sender-input">From</label>
                     <input type="text" id="sender-input" placeholder="Sender Nation" aria-label="Sender Nation" autocomplete="off">
                     <ul class="nation-dropdown">
-                    <li>Real Nation 1</li>
-                    <li>Real Nation 2</li>
-                    <li>Real Nation 3</li>
-                    <li>Real Nation 4</li>
-                    <li>Real Nation 5</li>
+                        <li>Real Nation 1</li>
+                        <li>Real Nation 2</li>
+                        <li>Real Nation 3</li>
+                        <li>Real Nation 4</li>
+                        <li>Real Nation 5</li>
                     </ul>
                 </div>
-                <div class="text-box text-box-small gold-corners nation-picker">
+                <div class="field nation-picker">
+                    <label class="field-label" for="recipient-input">To</label>
                     <input type="text" id="recipient-input" placeholder="Recipient Nation" aria-label="Recipient Nation" autocomplete="off">
                     <ul class="nation-dropdown">
-                    <li>NPC Nation 1</li>
-                    <li>NPC Nation 2</li>
-                    <li>NPC Nation 3</li>
-                    <li>NPC Nation 4</li>
-                    <li>NPC Nation 5</li>
-                    <li>Carmine Empire</li>
+                        <li>NPC Nation 1</li>
+                        <li>NPC Nation 2</li>
+                        <li>NPC Nation 3</li>
+                        <li>NPC Nation 4</li>
+                        <li>NPC Nation 5</li>
+                        <li>Carmine Empire</li>
                     </ul>
                 </div>
                 </div>
-                <div class="text-box gold-corners">
+                <div class="field message-field">
+                    <label class="field-label" for="visitor-text">Message</label>
                     <textarea id="visitor-text" placeholder="Input desired action here" aria-label="Enter your desired action"></textarea>
                 </div>
-                <button type="button" class="open-button" id="send-button">Send</button>
+                <button type="button" class="send-button" id="send-button">Send</button>
             </div>
-            <div class="response-box text-box gold-corners">
+            <div class="sheet reply gold-corners">
+                <h2 class="panel-label">Incoming Reply</h2>
                 <textarea id="ai-response" placeholder="The response will appear here..." aria-label="Response" readonly></textarea>
             </div>
         </div>
@@ -199,15 +215,77 @@
             <h2>Chess</h2>
             <p class="chess-opponent">Draven Morde, Councilor of Public Relations</p>
             <p class="chess-quote" id="chess-quote"></p>
+            <div class="draven-figure">
+                <img src="draven.png" alt="Draven Morde" onerror="this.parentNode.style.display='none'">
+            </div>
             <div class="chess-board" id="chess-board"></div>
             <p class="chess-status" id="chess-status"></p>
-            <button type="button" class="open-button" id="chess-new">New Game</button>
+            <div class="chess-controls">
+                <button type="button" class="open-button" id="chess-play-white">Play as White</button>
+                <button type="button" class="open-button" id="chess-play-black">Play as Black</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-admin-login">
+        <div class="modal-box admin-login-box">
+            <button class="modal-close" aria-label="Close">&times;</button>
+            <h2>Authority Access</h2>
+            <p class="admin-note">This area is for the keepers of the archive. Enter the passcode to continue.</p>
+            <div class="admin-field">
+                <label class="field-label" for="admin-passcode">Passcode</label>
+                <input type="password" id="admin-passcode" class="admin-input" autocomplete="off">
+            </div>
+            <p class="admin-error" id="admin-error" role="alert"></p>
+            <button type="button" class="open-button" id="admin-submit">Unlock</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-admin">
+        <div class="modal-box admin-box">
+            <button class="modal-close" aria-label="Close">&times;</button>
+            <h2>Relations Ledger</h2>
+
+            <div id="admin-list-view">
+                <p class="admin-note">Choose an NPC nation to view and change its relations with the real nations.</p>
+                <div class="npc-grid" id="admin-npc-grid"></div>
+            </div>
+
+            <div id="admin-map-view" hidden>
+                <div class="map-header">
+                    <button type="button" class="admin-back" id="admin-back">&larr; All NPC nations</button>
+                    <h3 class="map-title" id="admin-map-title"></h3>
+                </div>
+                <div class="relation-map-wrap">
+                    <svg id="relation-map" class="relation-map" viewBox="0 0 760 480" role="group" aria-label="Relations map"></svg>
+                </div>
+                <ul class="relation-legend">
+                    <li class="status-allied"><span class="swatch"></span>Allied</li>
+                    <li class="status-friendly"><span class="swatch"></span>Friendly</li>
+                    <li class="status-neutral"><span class="swatch"></span>Neutral</li>
+                    <li class="status-hostile"><span class="swatch"></span>Hostile</li>
+                    <li class="status-at-war"><span class="swatch"></span>At War</li>
+                </ul>
+                <div class="relation-chooser" id="admin-chooser"></div>
+            </div>
+
+            <div class="admin-footer">
+                <p class="admin-unpublished" id="admin-unpublished"></p>
+                <div class="admin-actions">
+                    <button type="button" class="open-button" id="admin-download">Download relations.js</button>
+                    <button type="button" class="open-button" id="admin-clear">Discard unpublished changes</button>
+                    <button type="button" class="open-button" id="admin-lock">Lock panel</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script src="actions.js"></script>
     <script src="chess.js"></script>
     <script src="chess-ui.js"></script>
+    <script src="relations.js"></script>
+    <script src="admin-config.js"></script>
+    <script src="admin.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
