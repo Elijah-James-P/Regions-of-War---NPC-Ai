@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passcode Maker | Regions of War</title>
+    <style>
+        body { font-family: Georgia, serif; background: #1a1510; color: #2b2015; display: flex; justify-content: center; padding: 2rem 1rem; }
+        main { width: 100%; max-width: 560px; background: #e8dcc0; border: 3px double #8b6914; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+        h1 { font-size: 1.5rem; margin-bottom: .6rem; letter-spacing: .06em; text-transform: uppercase; }
+        p { margin-bottom: 1rem; line-height: 1.6; }
+        label { display: block; font-size: .8rem; letter-spacing: .15em; text-transform: uppercase; color: #7a1f1f; margin-bottom: .3rem; }
+        input { width: 100%; padding: .6rem .8rem; font-size: 1rem; border: 1px solid #8b6914; border-bottom: 2px solid #4a3b28; background: #f6eed8; margin-bottom: 1rem; }
+        button { padding: .65rem 1.4rem; font-size: .9rem; letter-spacing: .1em; text-transform: uppercase; background: #7a1f1f; color: #f6e6d4; border: 1px solid #3d0c0c; cursor: pointer; }
+        button:hover { filter: brightness(1.12); }
+        textarea { width: 100%; height: 5.5rem; margin-top: 1rem; padding: .6rem; font-family: monospace; font-size: .85rem; border: 1px solid #8b6914; background: #f6eed8; }
+        .hint { font-size: .9rem; color: #4a3b28; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Passcode Maker</h1>
+        <p>Type the passcode you want for the authority panel. This page turns it into a scrambled line for <strong>admin-config.js</strong>. Nothing you type is sent anywhere.</p>
+        <p class="hint">Tip: a long passcode, like three or four random words, is much harder to guess than a short one.</p>
+
+        <label for="new-passcode">New passcode</label>
+        <input type="text" id="new-passcode" autocomplete="off">
+        <button type="button" id="make-hash">Make my line</button>
+
+        <textarea id="hash-output" readonly placeholder="Your line will appear here"></textarea>
+        <p class="hint" id="hash-help"></p>
+    </main>
+
+    <script src="admin-config.js"></script>
+    <script>
+        const makeButton = document.getElementById("make-hash");
+        const output = document.getElementById("hash-output");
+        const help = document.getElementById("hash-help");
+
+        function makeLine() {
+            const passcode = document.getElementById("new-passcode").value;
+            if (!passcode.trim()) {
+                help.textContent = "Type a passcode first.";
+                return;
+            }
+            help.textContent = "Working...";
+            setTimeout(function () {
+                output.value = 'const ADMIN_PASSCODE_HASH = "' + adminHash(passcode) + '";';
+                output.select();
+                help.textContent = "Copy that line, then open admin-config.js and replace the existing ADMIN_PASSCODE_HASH line with it. Save the file and refresh the site.";
+            }, 30);
+        }
+
+        makeButton.addEventListener("click", makeLine);
+        document.getElementById("new-passcode").addEventListener("keydown", function (event) {
+            if (event.key === "Enter") { makeLine(); }
+        });
+    </script>
+</body>
+</html>
