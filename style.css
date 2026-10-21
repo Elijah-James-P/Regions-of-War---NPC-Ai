@@ -1,14 +1,30 @@
+/* ==========================================================================
+   REGIONS OF WAR - site styles
+   (The chess window styles are kept in their own sections at the bottom.)
+   ========================================================================== */
+
 :root {
     --parchment: #e8dcc0;
+    --parchment-light: #f2e9d0;
     --parchment-dark: #d9c9a0;
     --ink: #2b2015;
     --ink-light: #4a3b28;
     --seal-red: #7a1f1f;
+    --seal-red-bright: #9b2b2b;
     --brass: #8b6914;
+    --brass-bright: #b8923a;
 
     --font-display: 'Cormorant SC', serif;
     --font-body: 'EB Garamond', serif;
     --font-stamp: 'Special Elite', monospace;
+
+    /* Fine paper speckle, drawn by the browser (no image file needed) */
+    --grain: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%27180%27%20height=%27180%27%3E%3Cfilter%20id=%27n%27%20color-interpolation-filters=%27sRGB%27%3E%3CfeTurbulence%20type=%27fractalNoise%27%20baseFrequency=%270.85%27%20numOctaves=%272%27%20stitchTiles=%27stitch%27/%3E%3CfeColorMatrix%20values=%270%200%200%200%200.24%20%200%200%200%200%200.16%20%200%200%200%200%200.08%20%200.9%200%200%200%20-0.28%27/%3E%3C/filter%3E%3Crect%20width=%27100%25%27%20height=%27100%25%27%20filter=%27url%28%23n%29%27/%3E%3C/svg%3E");
+
+    /* The aged-paper look shared by the main panels and pop-ups */
+    --paper:
+        var(--grain),
+        linear-gradient(165deg, #f3ead0 0%, #e8dcc0 50%, #dccb9f 100%);
 }
 
 * {
@@ -17,8 +33,17 @@
     box-sizing: border-box;
 }
 
+html {
+    scrollbar-color: var(--brass) #1a1510;
+}
+
+::selection {
+    background: var(--seal-red);
+    color: var(--parchment-light);
+}
+
 body {
-    background-color: var(--parchment);
+    background-color: #1a1510;
     color: var(--ink-light);
     font-family: var(--font-body);
     line-height: 1.7;
@@ -27,39 +52,129 @@ body {
     display: flex;
     flex-direction: column;
 
+    /* Top to bottom: edge vignette, warm tint, then the battlefield picture */
     background-image:
-        radial-gradient(circle at center, transparent 50%, rgba(0, 0, 0, 0.35) 100%),
-        url("images/background.jpg");
-    background-size: cover, cover;
-    background-position: center, center;
-    background-repeat: no-repeat, no-repeat;
-    background-attachment: fixed, fixed;
+        radial-gradient(ellipse at center, transparent 35%, rgba(8, 5, 2, 0.7) 100%),
+        linear-gradient(rgba(38, 26, 12, 0.35), rgba(38, 26, 12, 0.55)),
+        url("WebsiteBG.jpeg");
+    background-size: cover, cover, cover;
+    background-position: center, center, center;
+    background-repeat: no-repeat, no-repeat, no-repeat;
+    background-attachment: fixed, fixed, fixed;
 }
 
+/* ---------- Atmosphere: film grain and slow drifting embers ---------- */
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: var(--grain);
+    opacity: 0.55;
+    mix-blend-mode: overlay;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2400px;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.75;
+    background-image:
+        radial-gradient(circle, rgba(236, 200, 130, 0.55) 0, rgba(236, 200, 130, 0) 2px),
+        radial-gradient(circle, rgba(255, 220, 160, 0.4) 0, rgba(255, 220, 160, 0) 1.6px),
+        radial-gradient(circle, rgba(236, 190, 120, 0.5) 0, rgba(236, 190, 120, 0) 2.6px);
+    background-size: 600px 600px, 400px 400px, 300px 300px;
+    background-position: 80px 120px, 260px 40px, 150px 200px;
+    animation: drift 90s linear infinite;
+}
+
+@keyframes drift {
+    from { transform: translateY(0); }
+    to { transform: translateY(-1200px); }
+}
+
+@keyframes rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: none; }
+}
+
+/* ---------- Header ---------- */
+
 header {
+    position: relative;
+    z-index: 3;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 1.1rem 1.5rem;
+    padding: 1.7rem 1.5rem 1.5rem;
     border-bottom: 3px double var(--brass);
-    background-color: rgba(232, 220, 192, 0.88);
-    backdrop-filter: blur(2px);
+    background-image:
+        var(--grain),
+        linear-gradient(180deg, rgba(245, 236, 210, 0.96) 0%, rgba(228, 214, 180, 0.94) 100%);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), inset 0 -1px 0 rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(3px);
+    animation: rise 0.8s ease both;
+}
+
+.header-inner {
+    width: min(100%, 980px);
+    display: flex;
+    align-items: center;
+    gap: 1.6rem;
+}
+
+.header-rule {
+    position: relative;
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--brass) 75%);
+}
+
+.header-rule::after {
+    content: "";
+    position: absolute;
+    right: 2px;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    background: var(--brass);
+    outline: 1px solid var(--brass);
+    outline-offset: 3px;
+    transform: translateY(-50%) rotate(45deg);
+}
+
+.header-rule-right {
+    background: linear-gradient(270deg, transparent, var(--brass) 75%);
+}
+
+.header-rule-right::after {
+    right: auto;
+    left: 2px;
 }
 
 header h1 {
     font-family: var(--font-display);
-    font-size: 1.9rem;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 5.2vw, 3.4rem);
+    line-height: 1.1;
     color: var(--ink);
-    letter-spacing: 0.08em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
+    text-shadow: 0 1px 0 rgba(255, 248, 225, 0.85), 0 3px 8px rgba(43, 32, 21, 0.25);
 }
 
-
-
-
+/* ---------- Parchment corner marks (shared by panels and pop-ups) ---------- */
 
 .gold-corners {
+    --corner-inset: 4px;
     position: relative;
 }
 
@@ -73,7 +188,7 @@ header h1 {
     height: 100%;
     pointer-events: none;
     background-repeat: no-repeat;
-    background-size: 22px 3px, 3px 22px, 22px 3px, 3px 22px;
+    background-size: 26px 3px, 3px 26px, 26px 3px, 3px 26px;
     background-image:
         linear-gradient(var(--brass), var(--brass)),
         linear-gradient(var(--brass), var(--brass)),
@@ -82,24 +197,352 @@ header h1 {
 }
 
 .gold-corners::before {
-    background-position: top left, top left, top right, top right;
+    background-position:
+        left var(--corner-inset) top var(--corner-inset),
+        left var(--corner-inset) top var(--corner-inset),
+        right var(--corner-inset) top var(--corner-inset),
+        right var(--corner-inset) top var(--corner-inset);
 }
 
 .gold-corners::after {
-    background-position: bottom left, bottom left, bottom right, bottom right;
+    background-position:
+        left var(--corner-inset) bottom var(--corner-inset),
+        left var(--corner-inset) bottom var(--corner-inset),
+        right var(--corner-inset) bottom var(--corner-inset),
+        right var(--corner-inset) bottom var(--corner-inset);
 }
+
+/* ---------- Main page: the dispatch sheet and the reply sheet ---------- */
+
+main {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4.6rem 1.5rem 3rem;
+}
+
+.layout {
+    width: 100%;
+    max-width: 1300px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: center;
+    gap: 2.2rem;
+}
+
+.layout .dispatch {
+    flex: 1 1 400px;
+    max-width: 600px;
+    animation: rise 0.9s 0.15s ease both;
+}
+
+.layout .reply {
+    flex: 1 1 280px;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    animation: rise 0.9s 0.3s ease both;
+}
+
+.sheet {
+    width: 100%;
+    padding: 1.7rem 1.7rem 1.8rem;
+    background-image:
+        var(--grain),
+        linear-gradient(180deg, #f1e8cd 0%, #e8dcc0 50%, #e0d1a9 100%);
+    border: 1px solid rgba(139, 105, 20, 0.7);
+    outline: 1px solid rgba(139, 105, 20, 0.38);
+    outline-offset: -7px;
+    box-shadow:
+        inset 0 0 36px rgba(139, 105, 20, 0.14),
+        0 16px 36px rgba(0, 0, 0, 0.5),
+        0 3px 6px rgba(0, 0, 0, 0.35);
+}
+
+.panel-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--ink);
+    text-shadow: 0 1px 0 rgba(255, 248, 225, 0.7);
+}
+
+.panel-label::before,
+.panel-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--brass));
+}
+
+.panel-label::after {
+    background: linear-gradient(270deg, transparent, var(--brass));
+}
+
+.small-row {
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 1.2rem;
+}
+
+.small-row .field {
+    flex: 1;
+    min-width: 0;
+}
+
+.field {
+    position: relative;
+}
+
+.field-label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-family: var(--font-stamp);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--seal-red);
+}
+
+.sheet input,
+.sheet textarea {
+    display: block;
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    background-color: rgba(255, 250, 232, 0.45);
+    border: 1px solid rgba(139, 105, 20, 0.55);
+    border-bottom: 2px solid var(--ink-light);
+    border-radius: 1px;
+    color: var(--ink);
+    font-family: var(--font-stamp);
+    font-size: 0.95rem;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+    scrollbar-width: thin;
+    scrollbar-color: var(--brass) transparent;
+}
+
+.sheet input::placeholder,
+.sheet textarea::placeholder {
+    color: var(--ink-light);
+    opacity: 0.55;
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 1.05rem;
+}
+
+.sheet input:focus,
+.sheet textarea:focus {
+    outline: none;
+    background-color: rgba(255, 250, 232, 0.85);
+    border-color: var(--brass);
+    border-bottom-color: var(--seal-red);
+    box-shadow: 0 0 0 3px rgba(184, 146, 58, 0.28);
+}
+
+.nation-picker input {
+    padding-right: 2.2rem;
+}
+
+/* Little arrow that shows the field opens a list */
+.nation-picker::after {
+    content: "\25BE";
+    position: absolute;
+    right: 0.85rem;
+    bottom: 0.55rem;
+    color: var(--brass);
+    font-size: 0.95rem;
+    pointer-events: none;
+    transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.nation-picker:focus-within::after {
+    transform: rotate(180deg);
+    color: var(--seal-red);
+}
+
+/* Both big text areas are written on ruled paper */
+.message-field textarea,
+.reply textarea {
+    height: 210px;
+    resize: vertical;
+    line-height: 1.9rem;
+    padding: 0.4rem 0.85rem;
+    background-image: repeating-linear-gradient(
+        transparent 0,
+        transparent calc(1.9rem - 1px),
+        rgba(139, 105, 20, 0.28) calc(1.9rem - 1px),
+        rgba(139, 105, 20, 0.28) 1.9rem
+    );
+    background-position: 0 0.4rem;
+    background-attachment: local;
+}
+
+.reply textarea {
+    flex: 1;
+    height: auto;
+    min-height: 270px;
+    resize: none;
+    font-size: 0.9rem;
+    cursor: default;
+}
+
+/* ---------- Dropdown lists ---------- */
+
+.nation-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 100;
+    list-style: none;
+    max-height: 15rem;
+    overflow-y: auto;
+    background: linear-gradient(#f5ecd3, #e8dcc0);
+    border: 1px solid var(--brass);
+    border-top: 3px double var(--brass);
+    box-shadow: 0 14px 26px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    scrollbar-width: thin;
+    scrollbar-color: var(--brass) transparent;
+}
+
+.nation-dropdown.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.nation-dropdown li {
+    padding: 0.6rem 1rem;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    color: var(--ink);
+    cursor: pointer;
+    border-bottom: 1px solid rgba(139, 105, 20, 0.25);
+    transition: background-color 0.15s ease, color 0.15s ease, padding-left 0.15s ease;
+}
+
+.nation-dropdown li:last-child {
+    border-bottom: none;
+}
+
+.nation-dropdown li:hover {
+    background-color: var(--seal-red);
+    color: var(--parchment-light);
+    padding-left: 1.4rem;
+}
+
+/* ---------- Send button: a stamp of red wax ---------- */
+
+.send-button {
+    display: block;
+    min-width: 170px;
+    margin: 1.6rem auto 0;
+    padding: 0.8rem 2.2rem;
+    font-family: var(--font-stamp);
+    font-size: 0.85rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #f6e6d4;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55);
+    background: radial-gradient(ellipse at 30% 20%, var(--seal-red-bright), var(--seal-red) 55%, #4d1010);
+    border: 1px solid #3d0c0c;
+    border-radius: 2px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.25),
+        0 4px 10px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.send-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.12);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.25),
+        0 8px 16px rgba(0, 0, 0, 0.45);
+}
+
+.send-button:active {
+    transform: translateY(1px);
+    filter: brightness(0.95);
+}
+
+.send-button:focus-visible {
+    outline: 2px solid var(--brass-bright);
+    outline-offset: 3px;
+}
+
+.send-button:disabled,
+.send-button:disabled:hover {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    filter: grayscale(0.4);
+}
+
+/* ---------- Footer ---------- */
+
+footer {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem 1.5rem 2.3rem;
+    border-top: 3px double var(--brass);
+    font-family: var(--font-stamp);
+    font-size: 0.82rem;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+    background-image:
+        var(--grain),
+        linear-gradient(180deg, rgba(228, 214, 180, 0.94) 0%, rgba(245, 236, 210, 0.96) 100%);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(3px);
+    animation: rise 0.9s 0.45s ease both;
+}
+
+footer p::before {
+    content: "\2767";
+    margin-right: 0.8em;
+    color: var(--brass);
+}
+
+footer p::after {
+    content: "\2619";
+    margin-left: 0.8em;
+    color: var(--brass);
+}
+
+/* ---------- Content sections (kept for future pages) ---------- */
 
 section {
     max-width: 700px;
     margin: 2.5rem auto;
     padding: 2.5rem 2rem;
-    background-color: rgba(232, 220, 192, 0.9);
-    border: 1px solid rgba(139, 105, 20, 0.4);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(2px);
+    background-image: var(--paper);
+    border: 1px solid rgba(139, 105, 20, 0.6);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
 }
-
-
 
 section h2 {
     font-family: var(--font-display);
@@ -128,27 +571,33 @@ section p {
     font-size: 1.05rem;
 }
 
+/* ---------- Pop-ups other than chess (Factions, History, Gallery) ---------- */
+
 .nation-card {
+    position: relative;
     display: block;
-    background-color: var(--parchment-dark);
+    background: linear-gradient(135deg, #e0d1aa, #d4c294);
     border: 1px solid var(--brass);
-    padding: 1.5rem;
-    margin-top: 1.5rem;
-    box-shadow: 3px 3px 0 rgba(43, 32, 21, 0.15);
-    transition: transform 0.2s ease;
+    border-left: 5px solid var(--seal-red);
+    padding: 1.3rem 1.5rem;
+    margin-top: 1.3rem;
+    box-shadow: 3px 3px 0 rgba(43, 32, 21, 0.18), 0 6px 14px rgba(0, 0, 0, 0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     color: inherit;
     text-decoration: none;
 }
 
 .nation-card:hover {
     transform: translateY(-3px);
+    box-shadow: 4px 6px 0 rgba(43, 32, 21, 0.2), 0 12px 22px rgba(0, 0, 0, 0.28);
 }
 
 .nation-card h3 {
     font-family: var(--font-display);
     color: var(--seal-red);
     font-size: 1.4rem;
-    margin-bottom: 0.5rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.4rem;
 }
 
 #modal-history ul {
@@ -162,23 +611,41 @@ section p {
 }
 
 #modal-history li::before {
-    content: "❧";
+    content: "\2767";
     position: absolute;
     left: 0;
     color: var(--seal-red);
 }
 
-footer {
-    margin-top: auto;
-    text-align: center;
-    padding: 3.0rem;
-    border-top: 3px double var(--brass);
-    font-family: var(--font-stamp);
-    font-size: 0.8rem;
-    color: var(--ink);
-    background-color: rgba(232, 220, 192, 0.88);
-    backdrop-filter: blur(2px);
+.modal-box:not(.chess-box) {
+    background-image: var(--paper);
+    border: 3px double var(--brass);
+    box-shadow: inset 0 0 55px rgba(139, 105, 20, 0.18), 0 16px 40px rgba(0, 0, 0, 0.6);
+    scrollbar-width: thin;
+    scrollbar-color: var(--brass) transparent;
 }
+
+.modal-box:not(.chess-box) h2 {
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(139, 105, 20, 0.5);
+    text-shadow: 0 1px 0 rgba(255, 248, 225, 0.7);
+}
+
+.modal-box:not(.chess-box) .modal-close {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.modal-box:not(.chess-box) .modal-close:hover {
+    background-color: var(--seal-red);
+    color: var(--parchment-light);
+}
+
+/* ---------- Shared rules that the chess window also uses (unchanged) ---------- */
 
 .open-button {
     display: block;
@@ -199,6 +666,17 @@ footer {
     background-color: var(--seal-red);
     color: var(--parchment);
     border-color: var(--seal-red);
+}
+
+.open-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.open-button:disabled:hover {
+    background-color: transparent;
+    color: var(--ink);
+    border-color: var(--brass);
 }
 
 .modal-overlay {
@@ -275,171 +753,487 @@ footer {
     margin-top: 0;
 }
 
-main {
-    flex: 1;
+/* ---------- Authority panel (gear button and relations ledger) ---------- */
+
+:root {
+    --st-allied: #b8923a;
+    --st-friendly: #6b8a3a;
+    --st-neutral: #8a7c64;
+    --st-hostile: #c0622a;
+    --st-at-war: #7a1f1f;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.admin-gear {
+    position: absolute;
+    top: 1rem;
+    left: 1.2rem;
+    z-index: 5;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem 1.5rem;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    color: var(--ink);
+    background-image: var(--grain), radial-gradient(circle at 35% 30%, #f6edd3, #dccb9f);
+    border: 2px solid var(--brass);
+    border-radius: 50%;
+    box-shadow:
+        0 0 0 3px rgba(139, 105, 20, 0.25),
+        0 6px 14px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: box-shadow 0.25s ease;
 }
 
-.text-box {
-    width: 100%;
-    max-width: 600px;
-    padding: 1.2rem;
-    background-color: rgba(232, 220, 192, 0.9);
-    border: 1px solid rgba(139, 105, 20, 0.4);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+.admin-gear svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    transition: transform 0.6s ease;
 }
 
-.text-box textarea {
+.admin-gear:hover {
+    box-shadow:
+        0 0 0 3px rgba(184, 146, 58, 0.6),
+        0 8px 18px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.admin-gear:hover svg {
+    transform: rotate(90deg);
+}
+
+.admin-gear:focus-visible {
+    outline: 2px solid var(--brass-bright);
+    outline-offset: 4px;
+}
+
+.admin-login-box {
+    max-width: 440px;
+}
+
+.admin-box {
+    max-width: 940px;
+}
+
+.admin-note {
+    margin-bottom: 1.2rem;
+    text-align: center;
+    font-size: 1.02rem;
+    color: var(--ink-light);
+}
+
+.admin-field {
+    margin-top: 0.5rem;
+}
+
+.admin-input {
     display: block;
     width: 100%;
-    height: 220px;
-    resize: vertical;
-    padding: 1rem;
-    background-color: var(--parchment);
-    border: 1px solid var(--brass);
+    padding: 0.65rem 0.85rem;
+    background-color: rgba(255, 250, 232, 0.55);
+    border: 1px solid rgba(139, 105, 20, 0.55);
+    border-bottom: 2px solid var(--ink-light);
+    border-radius: 1px;
     color: var(--ink);
-    font-family: var(--font-body);
-    font-size: 1.05rem;
-    line-height: 1.6;
+    font-family: var(--font-stamp);
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.text-box textarea::placeholder {
-    color: var(--ink-light);
-    opacity: 0.6;
-}
-
-.text-box textarea:focus {
+.admin-input:focus {
     outline: none;
-    border-color: var(--seal-red);
+    border-color: var(--brass);
+    border-bottom-color: var(--seal-red);
+    box-shadow: 0 0 0 3px rgba(184, 146, 58, 0.28);
 }
 
+.admin-error {
+    min-height: 1.6rem;
+    margin-top: 0.7rem;
+    text-align: center;
+    font-family: var(--font-stamp);
+    font-size: 0.85rem;
+    color: var(--seal-red);
+}
 
-.input-stack {
-    width: 100%;
-    max-width: 600px;
+.admin-error.shake {
+    animation: shake 0.35s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-7px); }
+    40% { transform: translateX(7px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+}
+
+/* List of NPC nations */
+
+.npc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.npc-choice {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 0.2rem;
+    padding: 1rem 1.1rem;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    background: linear-gradient(135deg, #e0d1aa, #d4c294);
+    border: 1px solid var(--brass);
+    border-left: 5px solid var(--seal-red);
+    box-shadow: 3px 3px 0 rgba(43, 32, 21, 0.18);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.text-box-small {
-    padding: 0.7rem;
+.npc-choice:hover {
+    transform: translateY(-3px);
+    box-shadow: 4px 6px 0 rgba(43, 32, 21, 0.2), 0 10px 18px rgba(0, 0, 0, 0.25);
 }
 
-.text-box input {
+.npc-choice:focus-visible {
+    outline: 2px solid var(--brass-bright);
+    outline-offset: 3px;
+}
+
+.npc-choice-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    color: var(--seal-red);
+}
+
+.npc-choice-detail {
+    font-family: var(--font-stamp);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+}
+
+/* Relations map */
+
+.map-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.admin-back {
+    padding: 0.45rem 0.9rem;
+    background: none;
+    border: 1px solid var(--brass);
+    color: var(--ink);
+    font-family: var(--font-stamp);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.admin-back:hover {
+    background-color: var(--seal-red);
+    border-color: var(--seal-red);
+    color: var(--parchment-light);
+}
+
+.map-title {
+    flex: 1;
+    padding-right: 9rem;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.relation-map-wrap {
+    overflow-x: auto;
+    background: radial-gradient(ellipse at center, rgba(255, 250, 232, 0.35), rgba(139, 105, 20, 0.12));
+    border: 1px solid rgba(139, 105, 20, 0.45);
+    box-shadow: inset 0 0 30px rgba(139, 105, 20, 0.15);
+}
+
+.relation-map {
     display: block;
     width: 100%;
-    padding: 0.6rem 0.8rem;
-    background-color: var(--parchment);
-    border: 1px solid var(--brass);
-    color: var(--ink);
-    font-family: var(--font-body);
-    font-size: 1.05rem;
+    min-width: 620px;
+    height: auto;
 }
 
-.text-box input::placeholder {
-    color: var(--ink-light);
-    opacity: 0.6;
+.rel-line {
+    stroke: var(--st-neutral);
+    stroke-width: 2;
+    stroke-linecap: round;
 }
 
-.text-box input:focus {
-    outline: none;
-    border-color: var(--seal-red);
+.rel-line.status-allied { stroke: var(--st-allied); stroke-width: 4; }
+.rel-line.status-friendly { stroke: var(--st-friendly); stroke-width: 3; }
+.rel-line.status-neutral { stroke: var(--st-neutral); stroke-width: 2; }
+.rel-line.status-hostile { stroke: var(--st-hostile); stroke-width: 3; }
+.rel-line.status-at-war { stroke: var(--st-at-war); stroke-width: 4; stroke-dasharray: 9 7; }
+
+.rel-line.selected {
+    filter: drop-shadow(0 0 4px rgba(43, 32, 21, 0.55));
 }
 
-
-.nation-dropdown {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    right: 0;
-    z-index: 100;
-    list-style: none;
-    background-color: var(--parchment);
-    border: 1px solid var(--brass);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-6px);
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-}
-
-.nation-dropdown.open {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-.nation-dropdown li {
-    padding: 0.6rem 1rem;
-    font-family: var(--font-body);
-    font-size: 1.05rem;
-    color: var(--ink);
+.rel-node {
     cursor: pointer;
-    border-bottom: 1px solid rgba(139, 105, 20, 0.25);
+    outline: none;
 }
 
-.nation-dropdown li:last-child {
-    border-bottom: none;
+.rel-pill {
+    fill: #f6edd3;
+    stroke: var(--st-neutral);
+    stroke-width: 2;
+    transition: fill 0.15s ease, stroke-width 0.15s ease;
 }
 
-.nation-dropdown li:hover {
-    background-color: var(--seal-red);
-    color: var(--parchment);
+.rel-node.status-allied .rel-pill { stroke: var(--st-allied); }
+.rel-node.status-friendly .rel-pill { stroke: var(--st-friendly); }
+.rel-node.status-neutral .rel-pill { stroke: var(--st-neutral); }
+.rel-node.status-hostile .rel-pill { stroke: var(--st-hostile); }
+.rel-node.status-at-war .rel-pill { stroke: var(--st-at-war); }
+
+.rel-node:hover .rel-pill,
+.rel-node:focus-visible .rel-pill {
+    fill: #fff8e2;
+    stroke-width: 3.5;
 }
 
+.rel-node.selected .rel-pill {
+    fill: #fff8e2;
+    stroke-width: 4.5;
+}
 
-.layout {
-    width: 100%;
-    max-width: 1300px;
+.rel-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    fill: var(--ink);
+}
+
+.rel-status {
+    font-family: var(--font-stamp);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    fill: var(--ink-light);
+}
+
+.rel-center-circle {
+    fill: var(--seal-red);
+    stroke: var(--brass-bright);
+    stroke-width: 4;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+}
+
+.rel-center-ring {
+    fill: none;
+    stroke: rgba(255, 240, 215, 0.3);
+    stroke-width: 1.5;
+}
+
+.rel-center-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    fill: var(--parchment-light);
+}
+
+.rel-empty {
+    font-family: var(--font-stamp);
+    font-size: 14px;
+    fill: var(--ink-light);
+}
+
+.relation-legend {
+    list-style: none;
     display: flex;
     flex-wrap: wrap;
-    align-items: stretch;
     justify-content: center;
-    gap: 2rem;
+    gap: 0.5rem 1.4rem;
+    margin: 0.9rem 0 1rem;
+    font-family: var(--font-stamp);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
 }
 
-.layout .input-stack {
-    flex: 1 1 400px;
-    max-width: 600px;
-}
-
-.small-row {
+.relation-legend li {
     display: flex;
-    gap: 1.5rem;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.small-row .text-box-small {
-    flex: 1;
-    min-width: 0;
+.relation-legend .swatch {
+    display: inline-block;
+    width: 28px;
+    height: 0;
+    border-top: 3px solid var(--st-neutral);
 }
 
-.response-box {
-    flex: 1 1 280px;
-    max-width: 400px;
-    display: flex;
+.relation-legend .status-allied .swatch { border-top: 4px solid var(--st-allied); }
+.relation-legend .status-friendly .swatch { border-top: 3px solid var(--st-friendly); }
+.relation-legend .status-neutral .swatch { border-top: 2px solid var(--st-neutral); }
+.relation-legend .status-hostile .swatch { border-top: 3px solid var(--st-hostile); }
+.relation-legend .status-at-war .swatch { border-top: 4px dashed var(--st-at-war); }
+
+/* Status picker */
+
+.relation-chooser {
+    min-height: 6.4rem;
+    padding: 1rem;
+    text-align: center;
+    background: rgba(255, 250, 232, 0.4);
+    border: 1px solid rgba(139, 105, 20, 0.4);
 }
 
-.response-box textarea {
-    flex: 1;
-    height: auto;
-    min-height: 220px;
-    resize: none;
+.relation-chooser .admin-note {
+    margin: 1.2rem 0 0;
 }
 
-
-.open-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.open-button:disabled:hover {
-    background-color: transparent;
+.chooser-heading {
+    margin-bottom: 0.8rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: 0.06em;
     color: var(--ink);
-    border-color: var(--brass);
+}
+
+.status-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+}
+
+.status-btn {
+    --st: var(--st-neutral);
+    padding: 0.55rem 1rem;
+    background: transparent;
+    border: 2px solid var(--st);
+    color: var(--ink);
+    font-family: var(--font-stamp);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.status-btn.status-allied { --st: var(--st-allied); }
+.status-btn.status-friendly { --st: var(--st-friendly); }
+.status-btn.status-neutral { --st: var(--st-neutral); }
+.status-btn.status-hostile { --st: var(--st-hostile); }
+.status-btn.status-at-war { --st: var(--st-at-war); }
+
+.status-btn:hover,
+.status-btn.active {
+    background-color: var(--st);
+    color: #fff8e6;
+}
+
+.status-btn.status-allied:hover,
+.status-btn.status-allied.active {
+    color: var(--ink);
+}
+
+.status-btn:hover {
+    transform: translateY(-1px);
+}
+
+.status-btn:focus-visible {
+    outline: 2px solid var(--brass-bright);
+    outline-offset: 3px;
+}
+
+.admin-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(139, 105, 20, 0.5);
+}
+
+.admin-unpublished {
+    margin-bottom: 0.6rem;
+    text-align: center;
+    font-family: var(--font-stamp);
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--ink-light);
+}
+
+.admin-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+.admin-actions .open-button {
+    margin: 0;
+}
+
+@media (max-width: 640px) {
+    .map-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .map-title {
+        padding-right: 0;
+    }
+}
+
+/* ---------- Small screens and reduced motion ---------- */
+
+@media (max-width: 640px) {
+    .header-rule {
+        display: none;
+    }
+
+    main {
+        padding: 4.6rem 1rem 2rem;
+    }
+
+    .sheet {
+        padding: 1.4rem 1.2rem 1.5rem;
+    }
+
+    .small-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    header,
+    footer,
+    .layout .dispatch,
+    .layout .reply,
+    body::after {
+        animation: none;
+    }
 }
 
 
@@ -458,13 +1252,15 @@ main {
 
 .chess-quote {
     min-height: 4.2em;
-    margin-bottom: 1rem;
+    margin-bottom: 0.4rem;
     text-align: center;
     font-style: italic;
     color: var(--ink-light);
 }
 
 .chess-board {
+    position: relative;
+    z-index: 1;
     width: min(100%, 420px);
     margin: 0 auto;
     display: grid;
@@ -537,4 +1333,202 @@ main {
     font-size: 0.85rem;
     letter-spacing: 0.05em;
     color: var(--ink);
+}
+
+
+/* Draven stands behind the board with only the top part of the image showing */
+.draven-figure {
+    --draven-width: min(170px, 42vw);   /* how wide he appears */
+    --draven-ratio: 3.348;              /* image height divided by image width */
+    --draven-visible: 0.37;              /* how much of the image shows above the board (0.5 = half) */
+
+    position: relative;
+    width: var(--draven-width);
+    height: calc(var(--draven-width) * var(--draven-ratio) * var(--draven-visible));
+    margin: 0 auto;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.draven-figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
+}
+
+
+/* ---------- Chess window color scheme: dark grey and white ----------
+   Change the colors here to restyle the window. Delete this whole block
+   to go back to the parchment look. */
+
+.chess-box {
+    --chess-bg: #2f2f2f;       /* window background */
+    --chess-text: #f2f2f2;     /* main text */
+    --chess-muted: #b5b5b5;    /* smaller labels */
+    --chess-line: #d0d0d0;     /* borders */
+    --chess-light: #e6e6e6;    /* light board squares */
+    --chess-dark: #686868;     /* dark board squares */
+
+    background-color: var(--chess-bg);
+    border-color: var(--chess-line);
+    color: var(--chess-text);
+}
+
+.chess-box h2,
+.chess-box .chess-quote,
+.chess-box .chess-status {
+    color: var(--chess-text);
+}
+
+.chess-box .chess-opponent {
+    color: var(--chess-muted);
+}
+
+.chess-box .modal-close {
+    color: var(--chess-text);
+}
+
+.chess-box .modal-close:hover {
+    color: var(--chess-text);
+    opacity: 0.6;
+}
+
+.chess-box .open-button {
+    border-color: var(--chess-line);
+    color: var(--chess-text);
+}
+
+.chess-box .open-button:hover {
+    background-color: var(--chess-text);
+    border-color: var(--chess-text);
+    color: var(--chess-bg);
+}
+
+.chess-box .chess-board {
+    border-color: var(--chess-line);
+}
+
+.chess-square.light { background-color: var(--chess-light); }
+.chess-square.dark { background-color: var(--chess-dark); }
+
+.chess-square.light.lastmove {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25));
+}
+
+.chess-square.dark.lastmove {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.28));
+}
+
+/* A king in check keeps a red glow so it is impossible to miss */
+.chess-square.in-check {
+    background-image: radial-gradient(circle, rgba(220, 40, 40, 0.8) 0%, rgba(220, 40, 40, 0) 70%);
+}
+
+.chess-square.light.selected { box-shadow: inset 0 0 0 3px #1c1c1c; }
+.chess-square.dark.selected { box-shadow: inset 0 0 0 3px #ffffff; }
+
+.chess-square.light.target::after { background-color: rgba(30, 30, 30, 0.5); }
+.chess-square.dark.target::after { background-color: rgba(255, 255, 255, 0.6); }
+
+.chess-square.light.target.capture::after {
+    background: none;
+    border-color: rgba(30, 30, 30, 0.7);
+}
+
+.chess-square.dark.target.capture::after {
+    background: none;
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+.chess-piece.white {
+    color: #ffffff;
+    text-shadow: -1px -1px 0 #111, 1px -1px 0 #111, -1px 1px 0 #111, 1px 1px 0 #111, 0 0 3px #111;
+}
+
+.chess-piece.black {
+    color: #151515;
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.45);
+}
+
+.chess-box .draven-figure img {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+}
+
+
+/* ---------- Chess window: side buttons ---------- */
+
+.chess-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+}
+
+.chess-controls .open-button {
+    margin: 0;
+}
+
+/* The side currently being played */
+.chess-box .chess-controls .open-button.active {
+    background-color: var(--chess-text);
+    border-color: var(--chess-text);
+    color: var(--chess-bg);
+}
+
+/* ---------- Chess window: framed border ----------
+   An outer brass line (from the site's parchment theme), a dark grey band,
+   and a fine light-grey inner line, with small brass corner marks.
+   The corners are backgrounds of the window itself, so they stay fixed
+   while the contents scroll. Change the colors and sizes here to restyle
+   the frame. */
+
+.chess-box {
+    --chess-brass: #b08d45;          /* outer line and corner marks */
+    --chess-frame-gap: 7px;          /* distance from the outer line to the inner line */
+    --chess-corner-inset: 14px;      /* how far the corner marks sit inside the window */
+
+    border: 2px solid var(--chess-brass);
+    box-shadow:
+        inset 0 0 0 var(--chess-frame-gap) var(--chess-bg),
+        inset 0 0 0 calc(var(--chess-frame-gap) + 1px) rgba(208, 208, 208, 0.55),
+        0 10px 30px rgba(0, 0, 0, 0.5);
+
+    background-color: var(--chess-bg);
+    background-repeat: no-repeat;
+    background-size: 18px 2px, 2px 18px, 18px 2px, 2px 18px,
+                     18px 2px, 2px 18px, 18px 2px, 2px 18px;
+    background-position:
+        left var(--chess-corner-inset) top var(--chess-corner-inset),
+        left var(--chess-corner-inset) top var(--chess-corner-inset),
+        right var(--chess-corner-inset) top var(--chess-corner-inset),
+        right var(--chess-corner-inset) top var(--chess-corner-inset),
+        left var(--chess-corner-inset) bottom var(--chess-corner-inset),
+        left var(--chess-corner-inset) bottom var(--chess-corner-inset),
+        right var(--chess-corner-inset) bottom var(--chess-corner-inset),
+        right var(--chess-corner-inset) bottom var(--chess-corner-inset);
+    background-image:
+        linear-gradient(var(--chess-brass), var(--chess-brass)),
+        linear-gradient(var(--chess-brass), var(--chess-brass)),
+        linear-gradient(var(--chess-brass), var(--chess-brass)),
+        linear-gradient(var(--chess-brass), var(--chess-brass)),
+        linear-gradient(var(--chess-brass), var(--chess-brass)),
+        linear-gradient(var(--chess-brass), var(--chess-brass)),
+        linear-gradient(var(--chess-brass), var(--chess-brass)),
+        linear-gradient(var(--chess-brass), var(--chess-brass));
+
+    /* Hide the scrollbar; the window still scrolls with the wheel or touch */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.chess-box::-webkit-scrollbar {
+    display: none;
+}
+
+/* Keep the close button clear of the top-right corner mark */
+.chess-box .modal-close {
+    top: 1.3rem;
+    right: 1.6rem;
 }
