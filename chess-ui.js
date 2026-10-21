@@ -3,69 +3,130 @@
   ------------------------------
   Typing a chess challenge (for example "I want to play Chess") to the
   Carmine Empire summons Draven Morde, Councilor of Public Relations, for a
-  game. The player is White and clicks a piece, then a highlighted square.
+  game. The visitor chooses White or Black, then clicks a piece and a highlighted square.
 
   All of Draven's dialogue is in this file, so it is easy to edit.
   Needs chess.js (the engine) and the #modal-chess window in index.html.
 */
 
 // How many moves ahead Draven looks. 3 is quick and beatable; 4 is stronger but slower.
-const DRAVEN_DEPTH = 3;
+const DRAVEN_DEPTH = 4;
 
 // Draven's reply in the response box when the challenge is accepted.
 // {sender} and {recipient} are replaced with the chosen nations.
 const dravenIntroReplies = [
-    "Draven Morde, Councilor of Public Relations, has stepped forward to answer your challenge, {sender}. The Empire holds that a good game is the finest form of diplomacy, and he has asked for the board to be prepared at once. You will play White.",
-    "Word of your challenge has reached the Councilor of Public Relations, {sender}, and Draven Morde has accepted it personally. He wishes it known that he never refuses a match with a favorable public image. The board awaits, and the first move is yours.",
-    "The court of {recipient} sends word, {sender}: Draven Morde, Councilor of Public Relations, will play you. He insists the match be described as friendly in all official records. Take the white pieces and begin whenever you are ready."
+    "Draven Morde, Councilor of Public Relations, has stepped forward to answer your challenge, {sender}. He says the Empire believes a good game is the finest form of diplomacy, and that he has been hoping for a visitor with such confidence. You will play White.",
+    "Word of your challenge has reached the Councilor of Public Relations, {sender}, and Draven Morde has accepted it personally. He wishes it known that he never refuses a match with a favorable public image, particularly when it is his own. The board awaits, and the first move is yours.",
+    "The court of {recipient} sends word, {sender}: Draven Morde, Councilor of Public Relations, will play you. He insists the match be described as friendly in all official records, and that you not read too much into his enthusiasm. Take the white pieces and begin whenever you are ready."
 ];
 
 // Things Draven says during the game, grouped by what just happened
 const dravenLines = {
+    choose: [
+        "Do choose a side. Most people pick White and call it politeness. I would simply call it optimism.",
+        "White or Black, then? Take your time. I have all the patience a Councilor of Public Relations is required to pretend to have.",
+        "A small decision before we begin: which color would you like to lose with? Do not answer too quickly. It looks eager."
+    ],
+    startBlack: [
+        "Black, is it? How patient. I will begin, and you may react. It is, after all, the traditional division of labor in public life.",
+        "You prefer to respond rather than lead. A very senior instinct. Very well, I will take the opening statement.",
+        "Ah, Black. I do enjoy being asked to speak first. It means I get to set the tone."
+    ],
     start: [
-        "Do sit down. Every diplomatic crisis I have managed began with someone refusing a friendly game. You have the white pieces.",
-        "The Empire does not fear a challenge, only an unplanned one. Fortunately, I planned for this. Your move.",
-        "Councilor Draven Morde, at your service. I should warn you that I describe every loss as a strategic withdrawal. Please, begin."
+        "Please, sit. In my experience, the people who challenge me to a game are the same ones who later request a meeting. You may have White, a courtesy I will be mentioning later.",
+        "Ah, a challenger. How refreshing. I do so enjoy it when a guest volunteers to be a case study.",
+        "Draven Morde, Public Relations. I manage the Empire's reputation, which is a polite way of saying I have already won several arguments you have not had yet. Do begin.",
+        "I would wish you luck, but I find luck is mostly what people call preparation they did not do.",
+        "Welcome. Do relax. Nothing about this game is on the record, which is the only reason I am being so honest."
     ],
     playerCapture: [
-        "A bold exchange. I will be describing it to the press as a calculated loan.",
-        "You take a piece, and I take note. It will be reflected in the Empire's quarterly accounts.",
-        "Unfortunate. Fortunately, no one outside this room has seen it."
+        "You took a piece. How bold. I will make sure it is remembered as a learning experience for someone.",
+        "A capture. I do admire a person who acts before reading the fine print.",
+        "Mm. That one was mine, but I understand that boundaries are a developing concept for some nations.",
+        "Take it, please. I have always said that generosity is the cheapest form of strategy.",
+        "How decisive. And how very visible. I do hope you have a statement prepared.",
+        "Splendid. You have clearly confused having an opportunity with having a plan."
     ],
     dravenCapture: [
-        "A small acquisition. Entirely routine, I assure you.",
-        "I prefer to call it a merger. You may call it whatever your own council allows.",
-        "Your piece is now under Carmine management."
+        "I do apologize. I thought that piece was available. It was standing so confidently, after all.",
+        "A small acquisition. I will send you a very warm note about it.",
+        "Do not worry. I will describe it to the press as a misunderstanding on your side of the board.",
+        "Your piece has been welcomed into Carmine management. We are told the benefits are excellent.",
+        "There. See how smoothly that went? That is what planning looks like, in case you were wondering.",
+        "Another one, I am afraid. At this rate, we may need to schedule a review of your arrangements."
     ],
     check: [
-        "Your king appears to be under review.",
-        "I am obliged to inform you that your position has become a matter of public concern."
+        "Your king looks a little tense. Shall I have a statement prepared?",
+        "I hate to interrupt, but your king has become a matter of public concern.",
+        "A gentle reminder that your king is rather exposed at the moment. Nothing to panic about. Yet.",
+        "Check. Please take a moment. I would not want you to answer in haste, though everyone does.",
+        "Your king appears to be under review. I am sure it will go perfectly well."
     ],
     playerCheck: [
-        "An aggressive move. I will describe it as an unfortunate misunderstanding.",
-        "Check. Very direct. The Empire values directness, within reason."
+        "Check. How forward. I will describe it as an unfortunate misunderstanding.",
+        "Oh, direct pressure. The Empire values directness, within reason and within a budget.",
+        "Careful. That is the kind of move that makes headlines. Unfavorable ones, usually.",
+        "My king, concerned? Never. I was planning to move him anyway.",
+        "A threat to my king. How charming. Do keep it up, it makes what comes next so satisfying."
+    ],
+    playerQueenCapture: [
+        "My queen. Well. I shall be calling that a strategic divestment, and I will say it with a perfectly straight face.",
+        "You took my queen. I will describe it as a restructuring. You may describe it however you like, for now.",
+        "Bold. Reckless, perhaps, but bold. Do enjoy it. Public goodwill is fleeting, and so is a material advantage."
+    ],
+    dravenQueenCapture: [
+        "Your queen has retired. We hope she enjoys her new position. It is quite comfortable here.",
+        "I am so sorry about your queen. I will be sending flowers, and the invoice, to your nation.",
+        "Ah. There goes the most important member of your delegation. I do hope there is a backup."
+    ],
+    playerCastle: [
+        "Castling already? A sensible instinct. I, too, like to put things behind walls when the press arrives.",
+        "Safe at last. How prudent. I do respect a leader who knows when to hide behind a rook.",
+        "Tucking your king away. Very wise. The best kings are the ones nobody can reach for comment."
+    ],
+    dravenCastle: [
+        "Excuse me while I secure the premises. The Empire does not hold meetings in exposed locations.",
+        "A brief tidy-up. One must always protect the principal asset, and the principal asset is me.",
+        "There. Safe, comfortable, and entirely unbothered. You may continue."
+    ],
+    playerPromote: [
+        "A new queen. Congratulations. I will see to it that the Empire's response is gracious and entirely scripted.",
+        "Oh, a promotion. Even in a game, someone is always trying to rise above their station. I admire it.",
+        "Well, you have certainly been busy. Do let me know when you are finished consolidating."
+    ],
+    dravenPromote: [
+        "A promotion, it seems. Do not take it personally. It was entirely a merit decision.",
+        "Allow me to introduce my newest advisor. She has a great deal of authority and no sense of humor."
     ],
     idle: [
         "Interesting. I will need a statement for that one.",
-        "Take your time. A good press release should never be rushed.",
-        "The market for pawns remains stable.",
-        "Everything is proceeding exactly as planned. That is what I will say regardless."
+        "Take your time. A good press release should never be rushed, and neither should a bad one.",
+        "I have a feeling about this position. It is mostly a feeling that it is mine.",
+        "Everything is proceeding exactly as planned. That is what I will say regardless.",
+        "The best diplomacy is a long silence and a calm face. Both are on offer.",
+        "I do enjoy a game where no one has said anything they will regret. Yet.",
+        "You play like someone who reads the first page of the briefing. Admirable. Brief.",
+        "Mm. Yes. Go on. I am simply taking notes.",
+        "I see you have a plan. How lovely. I do so love a plan. They are so much easier to respond to.",
+        "I want you to know that I am enjoying this enormously, and that you should not take that as a compliment."
     ],
     allianceWin: [
-        "Checkmate. By the Empire's long tradition, an opponent who bests its Public Relations Councilor deserves its friendship. I will see to it that our foundries are put at your nation's disposal.",
-        "A decisive result. I will be informing the council that the Empire has lost a game and gained an ally, which I intend to describe as an excellent trade. Our arms will be manufactured for your nation from today."
+        "Checkmate. Well. I will be informing the council that the Empire lost a game and gained an ally, which I intend to describe as an excellent trade. The foundries are yours, and I trust you will use them kindly.",
+        "A decisive result, and I will be describing it as a deliberate one. By Carmine tradition, a victor over the Councilor of Public Relations earns the Empire's friendship. Our arms will be manufactured for your nation from today."
     ],
     playerWin: [
-        "Well played. I will announce that the Empire graciously allowed a distinguished guest to win.",
-        "Checkmate. I shall issue a statement of congratulations and a very quiet request for a rematch."
+        "Checkmate. Well played. I will announce that the Empire graciously allowed a distinguished guest to win, as a gesture of the alliance.",
+        "You win again. At this point I suspect you are simply collecting the foundry tour.",
+        "Checkmate. I shall issue a statement of congratulations, and a very quiet request for a rematch."
     ],
     dravenWin: [
-        "Checkmate. I will be sure to describe it as a mutually educational experience.",
-        "A fine game, and a better result for the Empire. The papers will call it a triumph of preparation."
+        "Checkmate. Do not be discouraged. I will describe it as a mutually educational experience, with me as the educator.",
+        "And that is the game. A fine result for the Empire, and a very instructive one for you. Please, let us do this again.",
+        "Checkmate. I want you to know I enjoyed it enormously, which I recognize is the worst thing I could possibly say."
     ],
     draw: [
-        "A draw. The most diplomatic of all outcomes.",
-        "Neither side prevails. I will describe it as a lasting partnership."
+        "A draw. The most diplomatic of all outcomes, and the least satisfying. I intend to call it a partnership.",
+        "Neither side prevails. I shall describe it as a lasting understanding, and we will both pretend to be pleased."
     ]
 };
 
@@ -88,7 +149,8 @@ const chessGlyphs = {
 const chessBoardEl = document.getElementById("chess-board");
 const chessStatusEl = document.getElementById("chess-status");
 const chessQuoteEl = document.getElementById("chess-quote");
-const chessNewButton = document.getElementById("chess-new");
+const chessWhiteButton = document.getElementById("chess-play-white");
+const chessBlackButton = document.getElementById("chess-play-black");
 
 let chessState = null;
 let chessLegalMoves = [];
@@ -101,12 +163,26 @@ let chessThinking = false;
 let chessLastQuote = "";
 let chessSender = "";            // the visitor's nation, who becomes the ally if they win
 let chessAllianceFormed = false;
-let chessGameId = 0;    // lets an old game's pending move be ignored after "New Game"
+let chessPlayerColor = null;     // "w" or "b" once the visitor has chosen a side
+let chessGameId = 0;    // lets an old game's pending move be ignored when a new game starts
 
 // True when a message is asking to play chess, e.g. "I want to play Chess"
 function isChessRequest(text) {
     const t = " " + text.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim() + " ";
     return /\schess\s/.test(t) && /\s(play|game|match|challenge|duel)\w*\s/.test(t);
+}
+
+function chessDravenColor() {
+    return chessPlayerColor === "w" ? "b" : "w";
+}
+
+function setActiveSideButton(color) {
+    if (chessWhiteButton && chessWhiteButton.classList) {
+        chessWhiteButton.classList.toggle("active", color === "w");
+    }
+    if (chessBlackButton && chessBlackButton.classList) {
+        chessBlackButton.classList.toggle("active", color === "b");
+    }
 }
 
 function setDravenQuote(eventName) {
@@ -125,15 +201,17 @@ function updateChessStatus() {
     if (!chessStatusEl || !chessState) {
         return;
     }
-    if (chessGameOver) {
+    if (!chessPlayerColor) {
+        chessStatusEl.textContent = "Choose your side to begin.";
+    } else if (chessGameOver) {
         chessStatusEl.textContent = (chessResultText[chessResult] || "The game is over.") +
             (chessAllianceFormed ? " The Carmine Empire is now your ally!" : "");
     } else if (chessThinking) {
         chessStatusEl.textContent = "Draven Morde is considering his move...";
-    } else if (ChessEngine.inCheck(chessState, "w")) {
+    } else if (ChessEngine.inCheck(chessState, chessPlayerColor)) {
         chessStatusEl.textContent = "Check! Your move.";
     } else {
-        chessStatusEl.textContent = "Your move. You are playing White.";
+        chessStatusEl.textContent = "Your move. You are playing " + (chessPlayerColor === "w" ? "White" : "Black") + ".";
     }
 }
 
@@ -156,8 +234,10 @@ function renderChessBoard() {
         ? chessState.board.indexOf(turn === "w" ? "K" : "k")
         : -1;
 
+    const flipped = chessPlayerColor === "b";
     let html = "";
-    for (let i = 0; i < 64; i++) {
+    for (let d = 0; d < 64; d++) {
+        const i = flipped ? 63 - d : d;
         const piece = chessState.board[i];
         let classes = "chess-square " + ((((i >> 3) + (i & 7)) % 2 === 0) ? "light" : "dark");
 
@@ -190,7 +270,7 @@ function recordChessPosition() {
 function checkChessEnd() {
     const status = ChessEngine.gameStatus(chessState);
     if (status === "checkmate") {
-        return chessState.turn === "b" ? "playerWin" : "dravenWin";
+        return chessState.turn === chessDravenColor() ? "playerWin" : "dravenWin";
     }
     if (status !== "ongoing") {
         return "draw:" + status;
@@ -225,9 +305,29 @@ function finishChessGame(result) {
     }
 }
 
-function chessPlayerMove(move) {
-    const wasCapture = !!move.captured;
+// Decides which kind of comment (if any) a move deserves
+function chessMoveEvent(move, who, givesCheck) {
+    const prefix = who === "player" ? "player" : "draven";
 
+    if (move.promo) {
+        return prefix + "Promote";
+    }
+    if (move.captured && move.captured.toUpperCase() === "Q") {
+        return prefix + "QueenCapture";
+    }
+    if (move.captured) {
+        return prefix + "Capture";
+    }
+    if (move.flag === "castleK" || move.flag === "castleQ") {
+        return prefix + "Castle";
+    }
+    if (givesCheck) {
+        return who === "player" ? "playerCheck" : "check";
+    }
+    return null;
+}
+
+function chessPlayerMove(move) {
     chessState = ChessEngine.applyMove(chessState, move);
     chessLastMove = move;
     chessSelected = null;
@@ -239,10 +339,9 @@ function chessPlayerMove(move) {
         return;
     }
 
-    if (wasCapture) {
-        setDravenQuote("playerCapture");
-    } else if (ChessEngine.inCheck(chessState, "b")) {
-        setDravenQuote("playerCheck");
+    const playerEvent = chessMoveEvent(move, "player", ChessEngine.inCheck(chessState, chessDravenColor()));
+    if (playerEvent) {
+        setDravenQuote(playerEvent);
     }
 
     chessLegalMoves = [];
@@ -264,7 +363,7 @@ function chessDravenMove() {
         return;
     }
 
-    const wasCapture = !!move.captured;
+    const isOpeningMove = chessLastMove === null;   // Draven opening as White: keep his greeting on screen
 
     chessState = ChessEngine.applyMove(chessState, move);
     chessLastMove = move;
@@ -278,11 +377,10 @@ function chessDravenMove() {
         return;
     }
 
-    if (wasCapture) {
-        setDravenQuote("dravenCapture");
-    } else if (ChessEngine.inCheck(chessState, "w")) {
-        setDravenQuote("check");
-    } else if (Math.random() < 0.3) {
+    const dravenEvent = chessMoveEvent(move, "draven", ChessEngine.inCheck(chessState, chessPlayerColor));
+    if (dravenEvent) {
+        setDravenQuote(dravenEvent);
+    } else if (!isOpeningMove && Math.random() < 0.45) {
         setDravenQuote("idle");
     }
 
@@ -290,7 +388,7 @@ function chessDravenMove() {
 }
 
 function handleChessClick(index) {
-    if (!chessState || chessGameOver || chessThinking) {
+    if (!chessState || !chessPlayerColor || chessGameOver || chessThinking) {
         return;
     }
 
@@ -306,7 +404,8 @@ function handleChessClick(index) {
     }
 
     const piece = chessState.board[index];
-    if (piece && piece === piece.toUpperCase() && index !== chessSelected) {
+    const isOwnPiece = piece && (piece === piece.toUpperCase()) === (chessPlayerColor === "w");
+    if (isOwnPiece && index !== chessSelected) {
         chessSelected = index;
     } else {
         chessSelected = null;
@@ -314,34 +413,75 @@ function handleChessClick(index) {
     renderChessBoard();
 }
 
-// Starts a fresh game for the given nation and opens the chess window. Returns false if the window is missing.
+// Opens the chess window so the visitor can choose a side. Returns false if the window is missing.
 function startChessGame(senderName) {
     if (!chessBoardEl) {
         return false;
     }
 
-    // The New Game button passes no nation, so the previous one is kept
     if (typeof senderName === "string") {
         chessSender = senderName;
     }
-    chessAllianceFormed = false;
 
     chessGameId++;
+    chessPlayerColor = null;
     chessState = ChessEngine.startState();
-    chessLegalMoves = ChessEngine.legalMoves(chessState);
+    chessLegalMoves = [];
     chessSelected = null;
     chessLastMove = null;
     chessPositionCounts = {};
     chessGameOver = false;
     chessResult = null;
     chessThinking = false;
+    chessAllianceFormed = false;
     chessLastQuote = "";
-    recordChessPosition();
 
-    setDravenQuote("start");
+    setActiveSideButton(null);
+    setDravenQuote("choose");
     refreshChess();
     openModal("chess");
     return true;
+}
+
+// Begins (or restarts) a game with the visitor playing the given color: "w" or "b"
+function beginChessGame(color) {
+    if (!chessBoardEl) {
+        return;
+    }
+
+    chessGameId++;
+    chessPlayerColor = color;
+    chessState = ChessEngine.startState();
+    chessLegalMoves = [];
+    chessSelected = null;
+    chessLastMove = null;
+    chessPositionCounts = {};
+    chessGameOver = false;
+    chessResult = null;
+    chessThinking = false;
+    chessAllianceFormed = false;
+    chessLastQuote = "";
+    recordChessPosition();
+    setActiveSideButton(color);
+
+    if (color === "w") {
+        chessLegalMoves = ChessEngine.legalMoves(chessState);
+        setDravenQuote("start");
+        refreshChess();
+        return;
+    }
+
+    // Visitor is Black, so Draven opens as White
+    setDravenQuote("startBlack");
+    chessThinking = true;
+    refreshChess();
+
+    const gameId = chessGameId;
+    setTimeout(function () {
+        if (gameId === chessGameId) {
+            chessDravenMove();
+        }
+    }, 700 + Math.random() * 400);
 }
 
 if (chessBoardEl) {
@@ -353,6 +493,14 @@ if (chessBoardEl) {
     });
 }
 
-if (chessNewButton) {
-    chessNewButton.addEventListener("click", startChessGame);
+if (chessWhiteButton) {
+    chessWhiteButton.addEventListener("click", function () {
+        beginChessGame("w");
+    });
+}
+
+if (chessBlackButton) {
+    chessBlackButton.addEventListener("click", function () {
+        beginChessGame("b");
+    });
 }
