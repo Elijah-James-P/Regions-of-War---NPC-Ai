@@ -271,7 +271,28 @@
 
             <div class="admin-footer">
                 <p class="admin-unpublished" id="admin-unpublished"></p>
+
+                <div class="publish-box">
+                    <label class="field-label" for="admin-token">GitHub access token</label>
+                    <div class="token-row">
+                        <input type="password" id="admin-token" class="admin-input" autocomplete="new-password" spellcheck="false" placeholder="Paste your token (needed once per visit)">
+                        <button type="button" class="admin-back" id="admin-forget-token" hidden>Forget token</button>
+                    </div>
+                    <p class="publish-help">The token is kept in this page's memory only. It is never saved, and it is forgotten when you reload the page or lock the panel. Anyone holding it can change your repository, so keep it private.</p>
+                    <details class="publish-steps">
+                        <summary>How do I get a token?</summary>
+                        <ol>
+                            <li>On GitHub, open <strong>Settings</strong>, then <strong>Developer settings</strong>, then <strong>Personal access tokens</strong>, then <strong>Fine-grained tokens</strong>, and choose <strong>Generate new token</strong>.</li>
+                            <li>Under <strong>Repository access</strong>, choose <strong>Only select repositories</strong> and pick this site's repository.</li>
+                            <li>Under <strong>Repository permissions</strong>, set <strong>Contents</strong> to <strong>Read and write</strong>.</li>
+                            <li>Give it a short expiry, generate it, and paste it above.</li>
+                        </ol>
+                    </details>
+                    <p class="publish-status" id="admin-publish-status" role="status" aria-live="polite"></p>
+                </div>
+
                 <div class="admin-actions">
+                    <button type="button" class="open-button publish-button" id="admin-publish">Publish to GitHub</button>
                     <button type="button" class="open-button" id="admin-download">Download relations.js</button>
                     <button type="button" class="open-button" id="admin-clear">Discard unpublished changes</button>
                     <button type="button" class="open-button" id="admin-lock">Lock panel</button>
