@@ -12,8 +12,10 @@
   PLEASE READ: this lock runs in the visitor's browser, so it keeps casual visitors
   out but it is not bank-level security. Someone with technical skill could get past it,
   but all they could change is their own copy of the page. The relations everyone
-  else sees come from relations.js, which only you can upload. Pick a long passcode
-  (a few random words works well) so it cannot be guessed from the hash.
+  else sees come from relations.js in your GitHub repository, and changing that
+  needs your GitHub token as well, so the token (not this passcode) is the real key
+  to the live site. Pick a long passcode (a few random words works well) so it
+  cannot be guessed from the hash.
 */
 
 const ADMIN_SALT = "regions-of-war";
@@ -21,6 +23,34 @@ const ADMIN_HASH_ROUNDS = 20000;
 
 // The passcode for the first run is: gaeia-admin   (change it as described above!)
 const ADMIN_PASSCODE_HASH = "780965d73bf8eeb1fa6c61b387f4c59e36e5b38cc1f5abeecbd475f381a7b5dd";
+
+/*
+  GITHUB PUBLISHING
+  -----------------
+  The "Publish to GitHub" button in the Relations Ledger saves the new relations.js
+  straight into your repository, so every visitor sees the change once GitHub Pages
+  has rebuilt the site (usually a minute or two).
+
+    owner  - the GitHub user or organisation that owns the site's repository
+    repo   - the repository's name
+    branch - the branch GitHub Pages publishes from (leave "" for the default branch)
+    path   - where relations.js sits inside the repository ("relations.js" if it is in
+             the top folder, or something like "docs/relations.js" if the site lives
+             in a docs folder)
+
+  If owner and repo are left empty and the site is on a github.io address, they are
+  worked out from the address automatically.
+
+  The access token is NOT stored in this file or anywhere else. You paste it into the
+  panel each visit. Create a "fine-grained personal access token" that is limited to
+  this one repository, with "Contents: Read and write" permission.
+*/
+const GITHUB_PUBLISH = {
+    owner: "",
+    repo: "",
+    branch: "",
+    path: "relations.js"
+};
 
 /* ---------- Scrambling code (SHA-256). No need to edit anything below. ---------- */
 
