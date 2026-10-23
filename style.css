@@ -1237,6 +1237,139 @@ section p {
 }
 
 
+/* ---------- Authority panel: publishing to GitHub ---------- */
+
+.publish-box {
+    margin: 0.2rem 0 1.1rem;
+    padding: 1rem 1.1rem 0.9rem;
+    background: rgba(255, 250, 232, 0.4);
+    border: 1px solid rgba(139, 105, 20, 0.4);
+    border-left: 4px solid var(--brass);
+}
+
+.token-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0.7rem;
+}
+
+.token-row .admin-input {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+}
+
+.token-row .admin-back {
+    flex: none;
+    white-space: nowrap;
+}
+
+.publish-help {
+    margin-top: 0.6rem;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--ink-light);
+}
+
+.publish-steps {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--ink-light);
+}
+
+.publish-steps summary {
+    display: inline-block;
+    font-family: var(--font-stamp);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--seal-red);
+    cursor: pointer;
+}
+
+.publish-steps summary::before {
+    content: "\25B8";
+    display: inline-block;
+    margin-right: 0.45em;
+    transition: transform 0.2s ease;
+}
+
+.publish-steps[open] summary::before {
+    transform: rotate(90deg);
+}
+
+.publish-steps summary:hover {
+    text-decoration: underline;
+}
+
+.publish-steps ol {
+    margin: 0.6rem 0 0.2rem 1.4rem;
+    line-height: 1.5;
+}
+
+.publish-steps li {
+    margin-bottom: 0.35rem;
+}
+
+.publish-status {
+    margin-top: 0.7rem;
+    font-family: var(--font-stamp);
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--ink-light);
+}
+
+.publish-status:empty {
+    display: none;
+}
+
+.publish-status.ok {
+    color: #3d5a1c;
+}
+
+.publish-status.error {
+    color: var(--seal-red);
+}
+
+.publish-status a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+/* The main action of the ledger: a stamp of red wax, like the Send button */
+.admin-actions .open-button.publish-button {
+    color: #f6e6d4;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55);
+    background: radial-gradient(ellipse at 30% 20%, var(--seal-red-bright), var(--seal-red) 55%, #4d1010);
+    border-color: #3d0c0c;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -2px 0 rgba(0, 0, 0, 0.25), 0 4px 10px rgba(0, 0, 0, 0.35);
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.admin-actions .open-button.publish-button:hover {
+    color: #f6e6d4;
+    border-color: #3d0c0c;
+    transform: translateY(-2px);
+    filter: brightness(1.12);
+}
+
+.admin-actions .open-button.publish-button:disabled,
+.admin-actions .open-button.publish-button:disabled:hover {
+    color: #f6e6d4;
+    border-color: #3d0c0c;
+    background-color: transparent;
+    transform: none;
+    filter: grayscale(0.4);
+}
+
+@media (max-width: 640px) {
+    .token-row {
+        flex-direction: column;
+    }
+}
+
+
 /* ---------- Chess (Draven Morde easter egg) ---------- */
 
 .chess-opponent {
