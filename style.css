@@ -1412,8 +1412,6 @@ section p {
     user-select: none;
 }
 
-.chess-square.light { background-color: #eadfc3; }
-.chess-square.dark { background-color: #b08d45; }
 
 .chess-square.lastmove {
     background-image: linear-gradient(rgba(122, 31, 31, 0.3), rgba(122, 31, 31, 0.3));
@@ -1491,27 +1489,49 @@ section p {
 }
 
 
-/* ---------- Chess window color scheme: dark grey and white ----------
-   Change the colors here to restyle the window. Delete this whole block
-   to go back to the parchment look. */
+/* ---------- Chess window color scheme ----------
+   Draven's game uses dark grey and white. Carmilla's game (.carmilla) switches
+   to Carmine red (#960018) with a deep wine background, warm ivory text and
+   antique gold trim. The grey overrides are in the last block of this file. */
 
 .chess-box {
-    --chess-bg: #2f2f2f;       /* window background */
-    --chess-text: #f2f2f2;     /* main text */
-    --chess-muted: #b5b5b5;    /* smaller labels */
-    --chess-line: #d0d0d0;     /* borders */
-    --chess-light: #e6e6e6;    /* light board squares */
-    --chess-dark: #686868;     /* dark board squares */
+    --chess-carmine: #960018;
+    --chess-bg: #2f2f2f;          /* window background (dark grey) */
+    --chess-panel: #2f2f2f;       /* inner band of the frame */
+    --chess-text: #f2f2f2;        /* main text */
+    --chess-muted: #b5b5b5;       /* smaller labels */
+    --chess-line: #d0d0d0;        /* borders */
+    --chess-light: #e6e6e6;       /* light board squares */
+    --chess-dark: #686868;        /* dark board squares */
+    --chess-brass: #b08d45;       /* outer line and corner marks */
+    --chess-accent: #d0d0d0;
 
     background-color: var(--chess-bg);
     border-color: var(--chess-line);
     color: var(--chess-text);
 }
 
+.chess-box.carmilla {
+    --chess-carmine: #7d0014;
+    --chess-bg: #12060a;
+    --chess-panel: #240910;
+    --chess-text: #f5e6e0;
+    --chess-muted: #d79a96;
+    --chess-line: #d4ad5f;
+    --chess-light: #e8cdb8;
+    --chess-dark: #7d0014;
+    --chess-brass: #d4ad5f;
+    --chess-accent: #ff3b57;
+}
+
 .chess-box h2,
 .chess-box .chess-quote,
 .chess-box .chess-status {
     color: var(--chess-text);
+}
+
+.chess-box h2 {
+    text-shadow: 0 0 14px rgba(214, 51, 77, 0.45);
 }
 
 .chess-box .chess-opponent {
@@ -1523,73 +1543,101 @@ section p {
 }
 
 .chess-box .modal-close:hover {
-    color: var(--chess-text);
-    opacity: 0.6;
+    color: var(--chess-accent);
+    opacity: 1;
 }
 
 .chess-box .open-button {
+    background-color: transparent;
     border-color: var(--chess-line);
     color: var(--chess-text);
 }
 
 .chess-box .open-button:hover {
-    background-color: var(--chess-text);
-    border-color: var(--chess-text);
-    color: var(--chess-bg);
+    background-color: var(--chess-carmine);
+    border-color: var(--chess-accent);
+    color: #fff;
 }
 
 .chess-box .chess-board {
     border-color: var(--chess-line);
+    box-shadow: 0 0 0 1px var(--chess-carmine), 0 6px 18px rgba(0, 0, 0, 0.55);
 }
 
 .chess-square.light { background-color: var(--chess-light); }
 .chess-square.dark { background-color: var(--chess-dark); }
 
 .chess-square.light.lastmove {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25));
+    background-image: linear-gradient(rgba(201, 163, 90, 0.55), rgba(201, 163, 90, 0.55));
 }
 
 .chess-square.dark.lastmove {
-    background-image: linear-gradient(rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.28));
+    background-image: linear-gradient(rgba(240, 200, 120, 0.38), rgba(240, 200, 120, 0.38));
 }
 
-/* A king in check keeps a red glow so it is impossible to miss */
+/* A king in check glows bright so it is impossible to miss */
 .chess-square.in-check {
-    background-image: radial-gradient(circle, rgba(220, 40, 40, 0.8) 0%, rgba(220, 40, 40, 0) 70%);
+    background-image: radial-gradient(circle, rgba(255, 214, 90, 0.95) 0%, rgba(255, 90, 60, 0.55) 40%, rgba(255, 90, 60, 0) 72%);
 }
 
-.chess-square.light.selected { box-shadow: inset 0 0 0 3px #1c1c1c; }
-.chess-square.dark.selected { box-shadow: inset 0 0 0 3px #ffffff; }
+.chess-square.light.selected { box-shadow: inset 0 0 0 3px var(--chess-carmine); }
+.chess-square.dark.selected { box-shadow: inset 0 0 0 3px #f0c878; }
 
-.chess-square.light.target::after { background-color: rgba(30, 30, 30, 0.5); }
-.chess-square.dark.target::after { background-color: rgba(255, 255, 255, 0.6); }
+.chess-square.light.target::after { background-color: rgba(150, 0, 24, 0.55); }
+.chess-square.dark.target::after { background-color: rgba(240, 200, 120, 0.8); }
 
 .chess-square.light.target.capture::after {
     background: none;
-    border-color: rgba(30, 30, 30, 0.7);
+    border-color: rgba(150, 0, 24, 0.85);
 }
 
 .chess-square.dark.target.capture::after {
     background: none;
-    border-color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(240, 200, 120, 0.9);
 }
 
 .chess-piece.white {
-    color: #ffffff;
-    text-shadow: -1px -1px 0 #111, 1px -1px 0 #111, -1px 1px 0 #111, 1px 1px 0 #111, 0 0 3px #111;
+    color: #fffaf0;
+    text-shadow: -1px -1px 0 #1a0409, 1px -1px 0 #1a0409, -1px 1px 0 #1a0409, 1px 1px 0 #1a0409, 0 0 3px #1a0409;
 }
 
 .chess-piece.black {
-    color: #151515;
-    text-shadow: 0 0 2px rgba(255, 255, 255, 0.45);
+    color: #120508;
+    text-shadow: 0 0 2px rgba(255, 235, 210, 0.7), 0 0 5px rgba(255, 235, 210, 0.25);
 }
 
 .chess-box .draven-figure img {
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 0 6px rgba(214, 51, 77, 0.45)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.55));
+}
+
+/* Draven's portrait is hidden if the file is missing */
+.draven-figure.missing {
+    display: none;
+}
+
+/* Carmilla's placeholder until carmilla.png exists: a gold crest on a carmine glow */
+.draven-figure.crest {
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.draven-figure.crest img {
+    display: none;
+}
+
+.draven-figure.crest::before {
+    content: "\265B";                       /* queen */
+    font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "DejaVu Sans", serif;
+    font-size: 4rem;
+    line-height: 1;
+    color: var(--chess-line);
+    text-shadow: 0 0 18px rgba(255, 59, 87, 0.75), 0 0 4px rgba(0, 0, 0, 0.8);
 }
 
 
-/* ---------- Chess window: side buttons ---------- */
+/* ---------- Chess window: buttons ---------- */
 
 .chess-controls {
     display: flex;
@@ -1603,30 +1651,49 @@ section p {
     margin: 0;
 }
 
-/* The side currently being played */
-.chess-box .chess-controls .open-button.active {
-    background-color: var(--chess-text);
-    border-color: var(--chess-text);
-    color: var(--chess-bg);
+.chess-controls[hidden],
+.chess-controls .open-button[hidden] {
+    display: none;
 }
 
+/* The side currently being played */
+.chess-box .chess-controls .open-button.active {
+    background-color: var(--chess-carmine);
+    border-color: var(--chess-accent);
+    color: #fff;
+}
+
+/* The single Proceed / Rematch button */
+.chess-box .chess-controls .chess-proceed {
+    min-width: 11rem;
+    background-color: var(--chess-carmine);
+    border-color: var(--chess-accent);
+    color: #fff;
+    letter-spacing: 0.12em;
+    box-shadow: 0 0 14px rgba(214, 51, 77, 0.45);
+}
+
+.chess-box .chess-controls .chess-proceed:hover {
+    background-color: var(--chess-accent);
+    border-color: #fff;
+}
+
+
 /* ---------- Chess window: framed border ----------
-   An outer brass line (from the site's parchment theme), a dark grey band,
-   and a fine light-grey inner line, with small brass corner marks.
-   The corners are backgrounds of the window itself, so they stay fixed
-   while the contents scroll. Change the colors and sizes here to restyle
-   the frame. */
+   An outer gold line, a wine-coloured band and a fine carmine inner line,
+   with small gold corner marks. The corners are backgrounds of the window
+   itself, so they stay fixed while the contents scroll. */
 
 .chess-box {
-    --chess-brass: #b08d45;          /* outer line and corner marks */
     --chess-frame-gap: 7px;          /* distance from the outer line to the inner line */
     --chess-corner-inset: 14px;      /* how far the corner marks sit inside the window */
 
     border: 2px solid var(--chess-brass);
     box-shadow:
-        inset 0 0 0 var(--chess-frame-gap) var(--chess-bg),
-        inset 0 0 0 calc(var(--chess-frame-gap) + 1px) rgba(208, 208, 208, 0.55),
-        0 10px 30px rgba(0, 0, 0, 0.5);
+        inset 0 0 0 var(--chess-frame-gap) var(--chess-panel),
+        inset 0 0 0 calc(var(--chess-frame-gap) + 1px) var(--chess-carmine),
+        0 10px 34px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(150, 0, 24, 0.35);
 
     background-color: var(--chess-bg);
     background-repeat: no-repeat;
@@ -1664,4 +1731,96 @@ section p {
 .chess-box .modal-close {
     top: 1.3rem;
     right: 1.6rem;
+}
+
+
+/* ---------- Chess window: the secret brass corner ----------
+   An invisible button over the bottom-left corner mark. The anchor is sticky,
+   so the button stays on the corner even while the window is scrolled. */
+
+.chess-secret-anchor {
+    position: sticky;
+    bottom: 0;
+    height: 0;
+    margin-bottom: -2rem;     /* cancels the window's bottom padding so the anchor can reach the corner */
+    z-index: 3;
+}
+
+.chess-secret {
+    position: absolute;
+    left: -1.5rem;
+    bottom: -1.6rem;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.chess-secret:focus-visible {
+    outline: 2px dashed var(--chess-line);
+    outline-offset: 2px;
+}
+
+
+/* ---------- Draven's game: the original dark grey and white ----------
+   Everything here applies only when the window is NOT in Carmilla's carmine mode. */
+
+.chess-box:not(.carmilla) {
+    box-shadow:
+        inset 0 0 0 var(--chess-frame-gap) var(--chess-bg),
+        inset 0 0 0 calc(var(--chess-frame-gap) + 1px) rgba(208, 208, 208, 0.55),
+        0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.chess-box:not(.carmilla) h2 { text-shadow: none; }
+
+.chess-box:not(.carmilla) .modal-close:hover { color: var(--chess-text); opacity: 0.6; }
+
+.chess-box:not(.carmilla) .open-button:hover {
+    background-color: var(--chess-text);
+    border-color: var(--chess-text);
+    color: var(--chess-bg);
+}
+
+.chess-box:not(.carmilla) .chess-board { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); }
+
+.chess-box:not(.carmilla) .chess-controls .open-button.active,
+.chess-box:not(.carmilla) .chess-controls .chess-proceed {
+    background-color: var(--chess-text);
+    border-color: var(--chess-text);
+    color: var(--chess-bg);
+    box-shadow: none;
+}
+
+.chess-box:not(.carmilla) .chess-controls .chess-proceed:hover {
+    background-color: transparent;
+    border-color: var(--chess-line);
+    color: var(--chess-text);
+}
+
+.chess-box:not(.carmilla) .chess-square.light.lastmove { background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)); }
+.chess-box:not(.carmilla) .chess-square.dark.lastmove { background-image: linear-gradient(rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.28)); }
+.chess-box:not(.carmilla) .chess-square.in-check { background-image: radial-gradient(circle, rgba(220, 40, 40, 0.8) 0%, rgba(220, 40, 40, 0) 70%); }
+.chess-box:not(.carmilla) .chess-square.light.selected { box-shadow: inset 0 0 0 3px #1c1c1c; }
+.chess-box:not(.carmilla) .chess-square.dark.selected { box-shadow: inset 0 0 0 3px #ffffff; }
+.chess-box:not(.carmilla) .chess-square.light.target::after { background-color: rgba(30, 30, 30, 0.5); }
+.chess-box:not(.carmilla) .chess-square.dark.target::after { background-color: rgba(255, 255, 255, 0.6); }
+.chess-box:not(.carmilla) .chess-square.light.target.capture::after { background: none; border-color: rgba(30, 30, 30, 0.7); }
+.chess-box:not(.carmilla) .chess-square.dark.target.capture::after { background: none; border-color: rgba(255, 255, 255, 0.8); }
+
+.chess-box:not(.carmilla) .chess-piece.white {
+    color: #ffffff;
+    text-shadow: -1px -1px 0 #111, 1px -1px 0 #111, -1px 1px 0 #111, 1px 1px 0 #111, 0 0 3px #111;
+}
+
+.chess-box:not(.carmilla) .chess-piece.black {
+    color: #151515;
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.45);
+}
+
+.chess-box:not(.carmilla) .draven-figure img {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
 }
