@@ -290,7 +290,7 @@ const nationReplies = {
             "Your message arrived, but its purpose was unclear, and the Empire does not act on unclear terms. Our ministers suggest you resubmit your request, preferably with specific details, such as a trade offer, a treaty, or a loan."
         ],
         allianceAnnouncement: [
-            "By decree of the council, {sender} is now a permanent ally of {recipient}. Our foundries will manufacture arms for your nation from this day forward, and the Empire's merchants will see that you are well supplied. Draven Morde sends his regards and requests a rematch at your convenience."
+            "By decree of Carmilla Carmine, Ruler of the Carmine Empire and CEO of Carmine Industries, {sender} is now a permanent ally of {recipient}. Our foundries will manufacture arms for your nation from this day forward, and the Empire's merchants will see that you are well supplied. Draven Morde sends his regards and requests a rematch at your convenience. The Ruler asks only that you remember who made the offer, and who is able to withdraw it."
 ],
         allied: {
             actions: {
