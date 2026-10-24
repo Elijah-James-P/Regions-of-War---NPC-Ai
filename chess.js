@@ -7,7 +7,8 @@
   Supports: all piece moves, castling, en passant, promotion, check,
   checkmate, stalemate, insufficient material, the fifty-move rule and
   position keys (for repetition). The computer opponent searches a few moves
-  ahead, so it plays sensibly but is beatable.
+  ahead, so it plays sensibly but is beatable. A second, stronger and more
+  unpredictable opponent (bestMoveStyled) is used for Carmilla Carmine.
 
   Board layout: an array of 64 squares, index 0 = a8 (top-left) to 63 = h1.
   Capital letters are white pieces (P N B R Q K), lowercase are black.
@@ -567,6 +568,409 @@ const ChessEngine = (function () {
         return best;
     }
 
+
+    /* ---------- Stronger, more varied opponent (used by Carmilla Carmine) ---------- */
+
+    // King table for the endgame, when the king should come out and fight (White's point of view)
+    const KING_ENDGAME = [
+        -50,-40,-30,-20,-20,-30,-40,-50,
+        -30,-20,-10,  0,  0,-10,-20,-30,
+        -30,-10, 20, 30, 30, 20,-10,-30,
+        -30,-10, 30, 40, 40, 30,-10,-30,
+        -30,-10, 30, 40, 40, 30,-10,-30,
+        -30,-10, 20, 30, 30, 20,-10,-30,
+        -30,-30,  0,  0,  0,  0,-30,-30,
+        -50,-30,-30,-30,-30,-30,-30,-50
+    ];
+
+    // Bonus for a passed pawn, by how far it has advanced (0 = still on its starting row)
+    const PASSED_BONUS = [0, 8, 15, 28, 48, 80, 120];
+
+    // A fuller evaluation than evaluate(): material and position, plus the bishop pair, pawn
+    // structure, rooks on open files, king safety, and an active king in the endgame.
+    // The score is from the point of view of the side to move.
+    function evaluateRich(state) {
+        const board = state.board;
+        const wCount = [0, 0, 0, 0, 0, 0, 0, 0];
+        const bCount = [0, 0, 0, 0, 0, 0, 0, 0];
+        const wMaxRow = [-1, -1, -1, -1, -1, -1, -1, -1];   // furthest-back white pawn on each file
+        const bMinRow = [99, 99, 99, 99, 99, 99, 99, 99];   // furthest-back black pawn on each file
+        const wPawns = [];
+        const bPawns = [];
+        const rooks = [];
+        let wBishops = 0;
+        let bBishops = 0;
+        let wKing = -1;
+        let bKing = -1;
+        let material = 0;
+        let score = 0;
+        let sq, p, type, white, row, col, i, f, value;
+
+        for (sq = 0; sq < 64; sq++) {
+            p = board[sq];
+            if (p === null) {
+                continue;
+            }
+            type = p.toUpperCase();
+            white = p === type;
+            row = sq >> 3;
+            col = sq & 7;
+
+            if (type === "K") {
+                if (white) { wKing = sq; } else { bKing = sq; }
+                continue;
+            }
+
+            value = VALUES[type] + (white ? PST[type][sq] : PST[type][(7 - row) * 8 + col]);
+            score += white ? value : -value;
+
+            if (type === "P") {
+                if (white) {
+                    wCount[col]++;
+                    if (row > wMaxRow[col]) { wMaxRow[col] = row; }
+                    wPawns.push(sq);
+                } else {
+                    bCount[col]++;
+                    if (row < bMinRow[col]) { bMinRow[col] = row; }
+                    bPawns.push(sq);
+                }
+                continue;
+            }
+
+            material += VALUES[type];
+            if (type === "B") {
+                if (white) { wBishops++; } else { bBishops++; }
+            } else if (type === "R") {
+                rooks.push(sq);
+            }
+        }
+
+        const phase = Math.min(1, material / 5200);   // 1 = full board, 0 = bare endgame
+
+        if (wBishops >= 2) { score += 25; }
+        if (bBishops >= 2) { score -= 25; }
+
+        // Pawn structure: doubled and isolated pawns are weak, passed pawns are strong
+        for (f = 0; f < 8; f++) {
+            if (wCount[f] > 1) { score -= 10 * (wCount[f] - 1); }
+            if (bCount[f] > 1) { score += 10 * (bCount[f] - 1); }
+            if (wCount[f] > 0 && (f === 0 || wCount[f - 1] === 0) && (f === 7 || wCount[f + 1] === 0)) { score -= 12 * wCount[f]; }
+            if (bCount[f] > 0 && (f === 0 || bCount[f - 1] === 0) && (f === 7 || bCount[f + 1] === 0)) { score += 12 * bCount[f]; }
+        }
+
+        const passedScale = 1.4 - 0.6 * phase;
+        for (i = 0; i < wPawns.length; i++) {
+            row = wPawns[i] >> 3;
+            col = wPawns[i] & 7;
+            if ((col === 0 || bMinRow[col - 1] >= row) && bMinRow[col] >= row && (col === 7 || bMinRow[col + 1] >= row)) {
+                score += PASSED_BONUS[6 - row] * passedScale;
+            }
+        }
+        for (i = 0; i < bPawns.length; i++) {
+            row = bPawns[i] >> 3;
+            col = bPawns[i] & 7;
+            if ((col === 0 || wMaxRow[col - 1] <= row) && wMaxRow[col] <= row && (col === 7 || wMaxRow[col + 1] <= row)) {
+                score -= PASSED_BONUS[row - 1] * passedScale;
+            }
+        }
+
+        // Rooks like open and half-open files
+        for (i = 0; i < rooks.length; i++) {
+            white = board[rooks[i]] === "R";
+            col = rooks[i] & 7;
+            if (white && wCount[col] === 0) { score += bCount[col] === 0 ? 18 : 9; }
+            if (!white && bCount[col] === 0) { score -= wCount[col] === 0 ? 18 : 9; }
+        }
+
+        // Kings: hide early in the game (with a pawn shield), come out in the endgame
+        let shield;
+        if (wKing !== -1) {
+            row = wKing >> 3;
+            col = wKing & 7;
+            score += phase * PST.K[wKing] + (1 - phase) * KING_ENDGAME[wKing];
+            if (row >= 6) {
+                shield = 0;
+                for (f = Math.max(0, col - 1); f <= Math.min(7, col + 1); f++) {
+                    if (board[(row - 1) * 8 + f] === "P") { shield += 9; }
+                    else if (row >= 2 && board[(row - 2) * 8 + f] === "P") { shield += 4; }
+                }
+                if (wCount[col] === 0) { shield -= 14; }
+                score += phase * shield;
+            }
+        }
+        if (bKing !== -1) {
+            row = bKing >> 3;
+            col = bKing & 7;
+            score -= phase * PST.K[(7 - row) * 8 + col] + (1 - phase) * KING_ENDGAME[(7 - row) * 8 + col];
+            if (row <= 1) {
+                shield = 0;
+                for (f = Math.max(0, col - 1); f <= Math.min(7, col + 1); f++) {
+                    if (board[(row + 1) * 8 + f] === "p") { shield += 9; }
+                    else if (row <= 5 && board[(row + 2) * 8 + f] === "p") { shield += 4; }
+                }
+                if (bCount[col] === 0) { shield -= 14; }
+                score -= phase * shield;
+            }
+        }
+
+        return (state.turn === "w" ? score : -score) + 8;   // a small bonus for having the move
+    }
+
+    // Information about the last bestMoveStyled search (handy for testing)
+    let lastStyledInfo = null;
+
+    /*
+      Chooses a move the way a sharp, unpredictable player would. It searches deeper than
+      bestMove (iterative deepening up to maxDepth, stopping when timeMs is used up), then
+      picks among the moves that are nearly as good as the best one, leaning towards checks,
+      captures and pressure on the enemy king, with a little randomness. Because it only
+      ever chooses moves within a small margin of the best, it stays tactically sound.
+
+      options: maxDepth, timeMs, moveNumber (half-moves played so far),
+               positionCounts (positionKey -> times seen, to avoid repeating positions)
+    */
+    function bestMoveStyled(state, options) {
+        options = options || {};
+        const maxDepth = options.maxDepth || 5;
+        const timeLimit = options.timeMs || 2200;
+        const moveNumber = options.moveNumber || 0;
+        const seen = options.positionCounts || {};
+        const started = Date.now();
+        const killers = [];
+        let nodes = 0;
+        let stopped = false;
+
+        function checkTime() {
+            nodes++;
+            if ((nodes & 511) === 0 && Date.now() - started > timeLimit) {
+                stopped = true;
+            }
+            return stopped;
+        }
+
+        function sameMove(a, b) {
+            return !!a && !!b && a.from === b.from && a.to === b.to;
+        }
+
+        function storeKiller(move, ply) {
+            if (move.captured) {
+                return;
+            }
+            const k = killers[ply] || (killers[ply] = [null, null]);
+            if (!sameMove(k[0], move)) {
+                k[1] = k[0];
+                k[0] = move;
+            }
+        }
+
+        function orderStyled(pairs, ply) {
+            const k = killers[ply];
+            pairs.forEach(function (pair) {
+                const m = pair.move;
+                let s = 0;
+                if (m.captured) {
+                    s += 10 * VALUES[m.captured.toUpperCase()] - VALUES[m.piece.toUpperCase()] + 10000;
+                } else if (k && (sameMove(k[0], m) || sameMove(k[1], m))) {
+                    s += 9000;
+                }
+                if (m.promo === "q") {
+                    s += 9500;
+                }
+                pair.rank = s;
+            });
+            return pairs.sort(function (a, b) { return b.rank - a.rank; });
+        }
+
+        function quiesceRich(st, alpha, beta, depthLeft) {
+            if (checkTime()) {
+                return 0;
+            }
+            const standPat = evaluateRich(st);
+            if (standPat >= beta) {
+                return beta;
+            }
+            if (standPat > alpha) {
+                alpha = standPat;
+            }
+            if (depthLeft === 0) {
+                return alpha;
+            }
+
+            const pairs = orderPairs(legalPairs(st, true));
+            for (let i = 0; i < pairs.length; i++) {
+                const score = -quiesceRich(pairs[i].next, -beta, -alpha, depthLeft - 1);
+                if (stopped) {
+                    return 0;
+                }
+                if (score >= beta) {
+                    return beta;
+                }
+                if (score > alpha) {
+                    alpha = score;
+                }
+            }
+            return alpha;
+        }
+
+        function negamaxRich(st, depth, alpha, beta, ply) {
+            if (checkTime()) {
+                return 0;
+            }
+
+            const checked = inCheck(st, st.turn);
+            if (depth <= 0) {
+                if (checked && ply < 14) {
+                    depth = 1;          // never stop the search while a king is in check
+                } else {
+                    return quiesceRich(st, alpha, beta, 5);
+                }
+            }
+
+            const pairs = legalPairs(st, false);
+            if (pairs.length === 0) {
+                return checked ? -MATE_SCORE + ply : 0;
+            }
+            if (st.halfmove >= 100) {
+                return 0;
+            }
+
+            orderStyled(pairs, ply);
+            for (let i = 0; i < pairs.length; i++) {
+                const move = pairs[i].move;
+                let score;
+
+                if (depth >= 3 && i >= 4 && !checked && !move.captured && !move.promo) {
+                    // Late quiet moves get a quicker look first, and a full one only if they surprise us
+                    score = -negamaxRich(pairs[i].next, depth - 2, -alpha - 1, -alpha, ply + 1);
+                    if (!stopped && score > alpha) {
+                        score = -negamaxRich(pairs[i].next, depth - 1, -beta, -alpha, ply + 1);
+                    }
+                } else {
+                    score = -negamaxRich(pairs[i].next, depth - 1, -beta, -alpha, ply + 1);
+                }
+
+                if (stopped) {
+                    return 0;
+                }
+                if (score >= beta) {
+                    storeKiller(move, ply);
+                    return beta;
+                }
+                if (score > alpha) {
+                    alpha = score;
+                }
+            }
+            return alpha;
+        }
+
+        const rootPairs = legalPairs(state, false);
+        if (rootPairs.length === 0) {
+            return null;
+        }
+        if (rootPairs.length === 1) {
+            lastStyledInfo = { depth: 0, nodes: 0, ms: 0, score: 0, candidates: 1 };
+            return rootPairs[0].move;
+        }
+
+        // Moves this close to the best are all kept and given exact scores
+        const windowMargin = moveNumber < 10 ? 75 : 40;
+
+        orderStyled(rootPairs, 0);
+        let completed = null;
+        let reached = 0;
+
+        for (let depth = 1; depth <= maxDepth && !stopped; depth++) {
+            const scored = [];
+            let best = -Infinity;
+
+            for (let i = 0; i < rootPairs.length; i++) {
+                const lower = best === -Infinity ? -Infinity : best - windowMargin;
+                const score = -negamaxRich(rootPairs[i].next, depth - 1, -Infinity, -lower, 1);
+                if (stopped) {
+                    break;
+                }
+                rootPairs[i].score = score;
+                scored.push({ pair: rootPairs[i], score: score });
+                if (score > best) {
+                    best = score;
+                }
+            }
+
+            if (stopped) {
+                break;
+            }
+            completed = scored;
+            reached = depth;
+            rootPairs.sort(function (a, b) { return b.score - a.score; });
+            if (best >= MATE_SCORE - 100) {
+                break;      // a forced mate has been found
+            }
+        }
+
+        if (!completed) {
+            return rootPairs[0].move;
+        }
+
+        let top = -Infinity;
+        completed.forEach(function (c) { if (c.score > top) { top = c.score; } });
+
+        // How much worse than the best move she is willing to go, for variety
+        let margin;
+        if (top >= MATE_SCORE - 100 || top <= -MATE_SCORE + 100) {
+            margin = 0;
+        } else if (top > 350) {
+            margin = 18;
+        } else if (top < -250) {
+            margin = 12;
+        } else {
+            margin = moveNumber < 10 ? 40 : 32;
+        }
+
+        const candidates = completed.filter(function (c) {
+            return margin === 0 ? c.score === top : c.score > top - margin;
+        });
+
+        const enemyKing = state.board.indexOf(state.turn === "w" ? "k" : "K");
+
+        function distance(a, b) {
+            return Math.max(Math.abs((a >> 3) - (b >> 3)), Math.abs((a & 7) - (b & 7)));
+        }
+
+        function styleBonus(pair) {
+            const m = pair.move;
+            const type = m.piece.toUpperCase();
+            let bonus = 0;
+
+            if (inCheck(pair.next, pair.next.turn)) { bonus += 14; }
+            if (m.captured) { bonus += 6; }
+            if (m.promo) { bonus += 25; }
+            if (moveNumber >= 10 && type !== "P" && type !== "K" && enemyKing !== -1) {
+                bonus += Math.max(-4, Math.min(8, (distance(m.from, enemyKing) - distance(m.to, enemyKing)) * 3));
+            }
+
+            const repeats = seen[positionKey(pair.next)] || 0;
+            if (repeats >= 1) { bonus -= 12 * repeats; }
+            if (repeats >= 2 && top > 40) { bonus -= 300; }   // never hand over a draw while better
+            return bonus;
+        }
+
+        let chosen = candidates[0];
+        let chosenValue = -Infinity;
+        candidates.forEach(function (c) {
+            const value = c.score + styleBonus(c.pair) + Math.random() * (moveNumber < 6 ? 55 : moveNumber < 10 ? 40 : 16);
+            if (value > chosenValue) {
+                chosenValue = value;
+                chosen = c;
+            }
+        });
+
+        lastStyledInfo = {
+            depth: reached, nodes: nodes, ms: Date.now() - started, score: top, candidates: candidates.length,
+            scores: completed.map(function (c) { return [c.pair.move.from, c.pair.move.to, Math.round(c.score)]; })
+        };
+        return chosen.pair.move;
+    }
+
     return {
         startState: startState,
         fromFEN: fromFEN,
@@ -576,6 +980,9 @@ const ChessEngine = (function () {
         gameStatus: gameStatus,
         positionKey: positionKey,
         perft: perft,
-        bestMove: bestMove
+        bestMove: bestMove,
+        bestMoveStyled: bestMoveStyled,
+        evaluateRich: evaluateRich,
+        styledInfo: function () { return lastStyledInfo; }
     };
 })();
