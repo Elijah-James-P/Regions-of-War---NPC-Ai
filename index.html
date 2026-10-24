@@ -210,19 +210,25 @@
     </div>
 
     <div class="modal-overlay" id="modal-chess">
-        <div class="modal-box chess-box">
+        <div class="modal-box chess-box" id="chess-box">
             <button class="modal-close" aria-label="Close">&times;</button>
             <h2>Chess</h2>
-            <p class="chess-opponent">Draven Morde, Councilor of Public Relations</p>
+            <p class="chess-opponent" id="chess-opponent">Draven Morde, Head of the Bureau of Civil Reform and Internal and External Affairs</p>
             <p class="chess-quote" id="chess-quote"></p>
-            <div class="draven-figure">
-                <img src="draven.png" alt="Draven Morde" onerror="this.parentNode.style.display='none'">
+            <div class="draven-figure" id="chess-figure">
+                <img id="chess-portrait" src="draven.png" alt="Draven Morde">
             </div>
             <div class="chess-board" id="chess-board"></div>
             <p class="chess-status" id="chess-status"></p>
             <div class="chess-controls">
                 <button type="button" class="open-button" id="chess-play-white">Play as White</button>
                 <button type="button" class="open-button" id="chess-play-black">Play as Black</button>
+                <button type="button" class="open-button chess-proceed" id="chess-proceed" hidden>Proceed</button>
+                <button type="button" class="open-button" id="chess-resign" hidden>Resign</button>
+                <button type="button" class="open-button" id="chess-new-game" hidden>Play a New Game</button>
+            </div>
+            <div class="chess-secret-anchor">
+                <button type="button" class="chess-secret" id="chess-secret" aria-label="Brass corner"></button>
             </div>
         </div>
     </div>
