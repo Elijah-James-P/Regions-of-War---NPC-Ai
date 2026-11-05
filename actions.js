@@ -374,3 +374,288 @@ const nationReplies = {
         }
     }
 };
+
+/*
+  RELATIONSHIP REPLIES
+  --------------------
+  How an NPC nation answers depends on its relationship with the sender, which is set in the
+  authority panel (relations.js). Statuses are grouped into three tones:
+    warm - Allied or Friendly: the nation agrees, helps, or is hurt by hostile messages
+    cool - Neutral (also used for any pair nobody has set): cautious, bargains, may agree on fair terms
+    cold - Hostile or At War: the nation refuses, answers sharply, or accepts the fight
+  Each action below has 2 replies for each tone. Special nations (nationReplies above, such as the
+  Carmine Empire) use their own replies instead. To add or change a reply, edit the lists here.
+*/
+
+function relationTier(status) {
+    if (status === "Allied" || status === "Friendly") {
+        return "warm";
+    }
+    if (status === "Hostile" || status === "At War") {
+        return "cold";
+    }
+    return "cool";
+}
+
+const relationReplies = {
+
+    // ---------- Hostile ----------
+    "War": {
+        warm: [
+            "A declaration of war from {sender}? {recipient} does not believe it, and will not answer it as one. Our ties are too old and too valuable to be thrown away on a single message. Withdraw it, and we will pretend it was never sent.",
+            "{recipient}'s court is stunned, {sender}. We took you for a friend and will not treat this as war unless you insist on it. Think carefully before you say it again, because our armies will answer if you do."
+        ],
+        cool: [
+            "War is declared, then, {sender}. {recipient} had no quarrel with you until today, but it will not be found unready. Our armies are mustering, and our envoys are being recalled from your borders.",
+            "{recipient} accepts your declaration and will defend itself. We did not seek this war, but we will not run from it. Expect our answer on the field."
+        ],
+        cold: [
+            "At last you say it plainly, {sender}. {recipient} has expected this for a long time and is ready. Our armies march, and we will not be the ones to ask for mercy.",
+            "Your declaration changes little, {sender}. {recipient} considered the matter settled long ago, and now the council makes it official. Our banners are already raised."
+        ]
+    },
+    "Threaten": {
+        warm: [
+            "A threat from {sender}, of all nations? {recipient} will choose to hear it as a misunderstanding. Friends do not speak this way, and we expect an explanation before we are forced to answer.",
+            "We will not be frightened by a friend, {sender}, but we will remember it. {recipient} asks you to withdraw the warning, and to remember who stands beside you."
+        ],
+        cool: [
+            "{recipient} does not yield to threats, {sender}. Your warning has been noted and our border garrisons doubled. If you want something from us, ask for it properly.",
+            "Pressure is a poor way to begin. {recipient} refuses your demands and will answer any move you make. Choose your next message carefully."
+        ],
+        cold: [
+            "Threaten us again, {sender}. {recipient} has heard worse from better enemies. Our answer is no, and it will remain no.",
+            "Your warning is noted and ignored. {recipient} fears nothing you can send, and our armies are ready for whatever you try."
+        ]
+    },
+    "Insult": {
+        warm: [
+            "That hurt, {sender}, coming from you. {recipient} will treat it as a bad day, and only once. Apologize, and we will forget it.",
+            "Our court is surprised and not amused. A friend may say hard things, but not like that. Mind your words, {sender}, or the friendship will not hold."
+        ],
+        cool: [
+            "{recipient} does not answer insults, {sender}, but it does remember them. You have made an enemy of a nation that wished you no harm. Be careful what you say next.",
+            "How rude. {recipient} will not deal with anyone who speaks like that. Come back when you have learned some manners."
+        ],
+        cold: [
+            "From you, {sender}, we expected nothing better. {recipient} laughs at your words and adds them to the long list of grievances.",
+            "Is that the best you have? {recipient} has suffered far greater insults from you, and each one will be repaid."
+        ]
+    },
+    "Embargo": {
+        warm: [
+            "An embargo against {recipient}? Surely you cannot mean it, {sender}. Your own merchants would suffer as much as ours, and we would be forced to answer in kind. Reconsider.",
+            "{recipient} is sorry to hear it and hopes it is a mistake. Our traders will lose much, and so will yours. We ask you to lift it, as friends should."
+        ],
+        cool: [
+            "{recipient} rejects your embargo and will answer it with one of its own. Our ports will close to your ships, {sender}. Lift yours at any time and ours will follow.",
+            "Your restrictions will cost us, and we will make sure they cost you more. {recipient} accepts this trade war, though we did not want it."
+        ],
+        cold: [
+            "Your embargo changes nothing, {sender}. We already traded with you as little as possible. {recipient} will close its ports entirely and we shall see who feels it first.",
+            "Good. {recipient} will not miss your merchants, and we will be glad to see your ships turned away from every harbor we control."
+        ]
+    },
+    "Spy": {
+        warm: [
+            "{recipient} does not understand what you are suggesting, {sender}, and would rather not. If you need to know something, ask us. A friend should not have to steal it.",
+            "We will pretend we did not read that. {recipient} asks you not to repeat it, for the sake of what lies between our nations."
+        ],
+        cool: [
+            "{recipient} knows nothing of this, and will keep it that way. We recommend that your agents stay out of our lands, {sender}, or they will be hanged.",
+            "Our counter-intelligence has taken note of your interest. Any spy found within our borders will be dealt with harshly. This subject is closed."
+        ],
+        cold: [
+            "We have known about your agents for months, {sender}. {recipient} has been feeding them exactly what we wanted them to read. Send more, if you like.",
+            "Your spies are already in our cells, {sender}. {recipient} suggests you stop wasting good people."
+        ]
+    },
+    "Demand tribute": {
+        warm: [
+            "Tribute? From {recipient}, to a friend? {sender}, you cannot be serious. We will gladly discuss help between equals, but we will not pay as a subject.",
+            "A strange demand from an old partner. {recipient} declines, and asks that you phrase it as a request before we speak of it again."
+        ],
+        cool: [
+            "{recipient} pays tribute to no one, {sender}. Your demand is refused, and any attempt to collect will be met with arms.",
+            "Do you take us for a vassal? {recipient} refuses. We will not send you a single coin."
+        ],
+        cold: [
+            "Come and collect it, {sender}. {recipient} will pay you in iron. Our answer is no, and it always will be.",
+            "Tribute? You will get nothing from us but steel. {recipient} will never bend to you."
+        ]
+    },
+
+    // ---------- Diplomatic ----------
+    "Alliance": {
+        warm: [
+            "{recipient} accepts, {sender}. Our friendship has earned this, and our court is glad to give it a name. Our diplomats will draft the pact at once, and our armies will stand with yours.",
+            "It would be an honor. {recipient} agrees to an alliance with {sender}, and will honor every term of it. Let our envoys meet to seal it."
+        ],
+        cool: [
+            "{recipient} is not ready to bind itself to you, {sender}, though we do not close the door. Prove yourself a reliable neighbor, and our answer may change. For now, we decline.",
+            "An alliance requires trust, and ours has barely begun. {recipient} refuses for now, but will gladly talk about trade and peace."
+        ],
+        cold: [
+            "An alliance? After all that lies between us, {sender}? {recipient} refuses, and will not discuss it again until the past is answered for.",
+            "No. {recipient} would sooner ally with the sea. Do not ask again, {sender}."
+        ]
+    },
+    "Peace": {
+        warm: [
+            "{recipient} welcomes it, {sender}. Peace between friends should never have been in doubt. Our armies will stand down, and our envoys will meet yours.",
+            "Gladly. {recipient} agrees to peace, and trusts that it will last. Our troops will withdraw from your borders at once."
+        ],
+        cool: [
+            "{recipient} accepts peace, {sender}, on fair terms. Our armies will stand down while our envoys meet. Do not mistake our willingness for weakness.",
+            "A truce is agreed, for now. {recipient} wants no more bloodshed than it must, and our diplomats will state the terms shortly."
+        ],
+        cold: [
+            "Peace is a word you have not earned, {sender}. {recipient} refuses to speak of it while the grievances between us stand.",
+            "{recipient} will consider a truce only if you meet our terms in full, and not before. Until then, nothing changes."
+        ]
+    },
+    "Treaty": {
+        warm: [
+            "{recipient} will sign, {sender}. Our scribes have reviewed the terms and found them fair between friends. Send your envoys to seal it.",
+            "Agreed in principle. Our ministers will finalize the clauses, and we will sign as soon as they are ready."
+        ],
+        cool: [
+            "{recipient} will negotiate, {sender}, but nothing is agreed. Our ministers will read every line, and we expect changes. Send your envoys and we will see.",
+            "We are willing to talk, but not to sign blindly. Revise the draft, and {recipient} will review it again."
+        ],
+        cold: [
+            "A treaty with you, {sender}? {recipient} refuses. We have signed paper with you before, and we know what it is worth.",
+            "No agreement will be signed while things stand as they are. {recipient} will not negotiate until your conduct changes."
+        ]
+    },
+    "Request aid": {
+        warm: [
+            "Of course, {sender}. {recipient} will send what it can, and our ministers are already gathering supplies. Tell us what you need most, and it will be on its way.",
+            "{recipient} stands by its friends. We grant your request, and our caravans and ships are being prepared as we speak."
+        ],
+        cool: [
+            "{recipient} will consider it, {sender}, but we can promise only a little. Tell us what you can give in return, and we will see what can be done.",
+            "We cannot give freely, but we will not refuse outright. Name your terms, and {recipient} will decide what it can spare."
+        ],
+        cold: [
+            "Help? From us? {recipient} refuses, {sender}. We will not feed those who work against us.",
+            "No. {recipient} owes you nothing, and gives you nothing. Ask someone who trusts you."
+        ]
+    },
+    "Apologize": {
+        warm: [
+            "Accepted, {sender}. {recipient} never held it against you for long. Let us put it behind us, as friends should.",
+            "We forgive you gladly. Good friends can make mistakes, and the ones that matter are the ones that are mended."
+        ],
+        cool: [
+            "{recipient} accepts your apology, {sender}, though trust will take time. Let your future actions confirm your words, and we will put the matter aside.",
+            "Your words are noted, and the matter is closed for now. {recipient} hopes that this is the end of it."
+        ],
+        cold: [
+            "Words are cheap, {sender}. {recipient} does not accept your apology, and will not until it is backed by deeds.",
+            "You are sorry now that it costs you something. {recipient} refuses, and remembers."
+        ]
+    },
+    "Open relations": {
+        warm: [
+            "Always a pleasure, {sender}. {recipient} welcomes you with open arms, and our embassy is yours to use. Tell us what you need.",
+            "Greetings, friend. {recipient} is glad to hear from you, and our door stands open to your envoys at any hour."
+        ],
+        cool: [
+            "{recipient} welcomes your greeting, {sender}, and is willing to open formal relations. Send your envoy, and we will receive them politely.",
+            "Greetings. {recipient} accepts your message and will treat your envoy with courtesy. We will see what comes of it."
+        ],
+        cold: [
+            "Your greeting is received, {sender}, but not welcomed. {recipient} sees no reason to open relations while matters stand as they do.",
+            "{recipient} will not receive your envoy. We have nothing to say to you until the past is settled."
+        ]
+    },
+
+    // ---------- Economic and resources ----------
+    "Trade": {
+        warm: [
+            "{recipient} agrees to trade with you, {sender}, and at favorable rates. Our merchants will send their offer, and our ports are open to your ships.",
+            "Gladly. Trade between friends enriches everyone. {recipient} accepts, and our traders will meet yours."
+        ],
+        cool: [
+            "{recipient} will trade with you, {sender}, at standard terms. Our merchants will send a price list, and we will see how it goes.",
+            "A modest agreement is possible. {recipient} accepts limited trade while we learn whether you can be trusted."
+        ],
+        cold: [
+            "{recipient} will not trade with you, {sender}. Our ports are closed to your ships, and our merchants have been told not to deal with you.",
+            "No. We do not trade with those who work against us. Take your goods elsewhere."
+        ]
+    },
+    "Gift": {
+        warm: [
+            "{recipient} accepts your gift with thanks, {sender}, and will send one in return. Your generosity will not be forgotten.",
+            "How kind. {recipient} is touched, and will repay it in time. Our friendship grows stronger for it."
+        ],
+        cool: [
+            "{recipient} accepts your gift, {sender}, and wonders what it is meant to buy. We welcome the gesture, and may return it if you prove worthy.",
+            "A pleasant surprise. {recipient} will keep it, and will think better of you for it."
+        ],
+        cold: [
+            "{recipient} refuses your gift, {sender}. We will not be bought, and we do not trust what comes from you. It has been sent back.",
+            "Keep it. {recipient} suspects a trap, and wants nothing that comes from your hands."
+        ]
+    },
+    "Loan": {
+        warm: [
+            "{recipient}'s treasury agrees, {sender}. Your credit is good with us, and the rate will be low. Our ministers will send the terms.",
+            "Of course. A friend in need is a friend to help. {recipient} grants the loan, and repayment can be arranged at your convenience."
+        ],
+        cool: [
+            "{recipient} will lend, but at a fair rate and with surety. Our treasurers will name their terms, {sender}. Do not expect charity.",
+            "We will consider it. Our ministers will want guarantees, and the interest will not be gentle."
+        ],
+        cold: [
+            "A loan? To you? {recipient} refuses, {sender}. You would not repay it, and we would not collect it kindly.",
+            "No. {recipient}'s treasury is closed to you."
+        ]
+    },
+    "Crystals": {
+        warm: [
+            "{recipient} will share what it can on the matter of crystals, {sender}. Our friendship allows more than most, and our scholars will meet yours. Some secrets will remain ours, however.",
+            "The crystals are not lightly discussed, but we trust you. {recipient} agrees to cooperate, and our ministers will arrange the terms."
+        ],
+        cool: [
+            "Crystals are a matter of great sensitivity, {sender}. {recipient} will not share what we know, though we may trade in them at a high price.",
+            "We are not ready to speak of crystals with you. {recipient} declines for now, and asks that you do not press the matter."
+        ],
+        cold: [
+            "You will learn nothing of crystals from us, {sender}. {recipient} would sooner destroy them than see you hold them.",
+            "Never. {recipient} refuses, and any attempt to take them will be treated as an act of war."
+        ]
+    },
+
+    // ---------- Other ----------
+    "Migration or refuge": {
+        warm: [
+            "{recipient} opens its borders to your people, {sender}. Those who flee will find shelter and work, and our officials will see to them.",
+            "Of course. Refuge for the needy is the least a friend can offer. {recipient} will take them in."
+        ],
+        cool: [
+            "{recipient} will take a limited number, {sender}, and only after they are checked. Our officials will set the terms at the border.",
+            "We can offer shelter to some, but not all. {recipient} will decide how many we can feed."
+        ],
+        cold: [
+            "Our borders are closed to your people, {sender}. {recipient} will not take in those we cannot trust, and the guards have been ordered to turn them away.",
+            "No refuge will be given. {recipient} wants no spies among the refugees, and sends them back."
+        ]
+    },
+    "Puppet or annex": {
+        warm: [
+            "{recipient} values your friendship, {sender}, but not that much. We refuse to become a part of you, and ask that you not raise it again.",
+            "A proposal we cannot accept. {recipient} will stand with you as an equal, but never beneath you."
+        ],
+        cool: [
+            "{recipient} refuses, {sender}. We are a sovereign nation and will remain one. Your proposal is an insult, and we will treat it as such if repeated.",
+            "No. We will not be your puppet, nor will we be annexed. {recipient} will defend its freedom."
+        ],
+        cold: [
+            "Annex us? Try it. {recipient} will resist you to the last man, {sender}, and we will make you regret the attempt.",
+            "You will have {recipient} only over our dead. Our answer is no, and our armies are ready."
+        ]
+    }
+};
