@@ -58,11 +58,29 @@ nationPickers.forEach(function (picker) {
 
     function open() {
         closeAllDropdowns();
+        showAll();
+        dropdown.classList.add("open");
+    }
+
+    const items = dropdown.querySelectorAll("li");
+
+    function showAll() {
+        items.forEach(function (item) { item.hidden = false; });
+    }
+
+    // Typing narrows the list down to the nations whose names contain what was typed
+    function filterList() {
+        const typed = input.value.trim().toLowerCase();
+        items.forEach(function (item) {
+            item.hidden = typed !== "" && item.textContent.toLowerCase().indexOf(typed) === -1;
+        });
+        closeAllDropdowns();
         dropdown.classList.add("open");
     }
 
     input.addEventListener("focus", open);
     input.addEventListener("click", open);
+    input.addEventListener("input", filterList);
 
     dropdown.querySelectorAll("li").forEach(function (item) {
         item.addEventListener("click", function () {
@@ -160,6 +178,14 @@ function findPersonality(nationName) {
         return name.toLowerCase() === wanted;
     });
     return match ? nationReplies[match] : null;
+}
+
+// "warm", "cool" or "cold": how the recipient feels about the sender (see relationReplies in actions.js)
+function relationToneFor(recipient, sender) {
+    if (typeof getRelationStatus !== "function" || typeof relationTier !== "function") {
+        return "cool";
+    }
+    return relationTier(getRelationStatus(recipient, sender));
 }
 
 function fillNames(reply, sender, recipient) {
@@ -335,10 +361,16 @@ function handleSend() {
         let replyKey;
 
         if (action) {
+            // Nations without their own replies answer according to how they feel about the sender
+            const tone = relationToneFor(recipient, sender);
+            const toned = typeof relationReplies !== "undefined" && relationReplies[action.name]
+                ? relationReplies[action.name][tone]
+                : null;
             replies = (allied && allied.actions[action.name]) ||
                 (personality && personality.actions[action.name]) ||
+                toned ||
                 action.replies;
-            replyKey = recipient + "|" + (allied ? "allied|" : "") + action.name;
+            replyKey = recipient + "|" + (allied ? "allied|" : "") + tone + "|" + action.name;
         } else {
             replies = (allied && allied.fallback) ||
                 (personality && personality.fallback) ||
