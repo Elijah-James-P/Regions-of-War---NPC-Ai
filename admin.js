@@ -600,7 +600,10 @@ if (adminGear) {
     // Draws the NPC nation in the centre with a line to every real nation
     function renderRelationMap() {
         clearElement(mapSvg);
-        const reals = readNationList("sender-input");
+        // A nation is never shown with a relationship to itself (the Carmine Empire is in both lists)
+        const reals = readNationList("sender-input").filter(function (name) {
+            return relationName(name) !== relationName(currentNpc);
+        });
         const cx = 380;
         const cy = 250;
         const radiusX = 285;
